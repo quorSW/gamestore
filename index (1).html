@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GameStore</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #080810;
+  --bg2: #0e0e1a;
+  --bg3: #161624;
+  --card: #131320;
+  --border: #252538;
+  --border2: #30304a;
+  --accent: #7c3aed;
+  --accent2: #a855f7;
+  --glow: rgba(124,58,237,0.25);
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --text: #f0f0fa;
+  --text2: #8888aa;
+  --text3: #44445a;
+  --radius: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 84px;
+}
+
+/* HEADER */
+.header {
+  background: rgba(8,8,16,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 10px;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.logo {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px; font-weight: 700; letter-spacing: 3px;
+  background: linear-gradient(90deg, #c084fc, #7c3aed);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.logo-dot { -webkit-text-fill-color: var(--gold); color: var(--gold); }
+.icon-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 7px 10px;
+  font-size: 17px; cursor: pointer; transition: .15s;
+  position: relative;
+}
+.icon-btn:active { transform: scale(.92); }
+.badge {
+  position: absolute; top: -5px; right: -5px;
+  background: var(--red); color: #fff;
+  font-size: 9px; font-weight: 700;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+}
+.badge.on { display: flex; }
+
+/* SEARCH */
+.search-wrap { position: relative; margin-bottom: 10px; }
+.search-input {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 9px 36px 9px 14px;
+  font-size: 14px; color: var(--text);
+  outline: none; transition: border .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text3); }
+.search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 6px;
+  overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; padding: 6px 13px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+  color: var(--text2); cursor: pointer; transition: .2s;
+  white-space: nowrap;
+}
+.tab.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; box-shadow: 0 0 14px var(--glow);
+}
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* HERO */
+.hero {
+  margin: 14px 14px 0;
+  background: linear-gradient(135deg, #1e0a4a 0%, #0a1035 60%, #0a1a20 100%);
+  border: 1px solid #2a1a5a;
+  border-radius: 20px; padding: 20px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -60px; right: -40px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(124,58,237,.4), transparent 70%);
+  border-radius: 50%; pointer-events: none;
+}
+.hero-tag {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--gold), #f97316);
+  color: #000; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  margin-bottom: 10px; letter-spacing: .5px;
+}
+.hero h2 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 26px; font-weight: 700; line-height: 1.15;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff 40%, #c4b5fd);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.hero-chips { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.chip {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 20px; padding: 4px 10px; font-size: 11px; color: var(--text2);
+}
+
+/* SECTION */
+.section { padding: 18px 14px 0; }
+.sec-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.sec-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 17px; font-weight: 700; letter-spacing: .5px;
+}
+.sec-all {
+  font-size: 12px; color: var(--accent2); cursor: pointer;
+  background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.25);
+  padding: 4px 10px; border-radius: 20px;
+}
+
+/* GAME CARDS 2-col */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.game-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 12px;
+  cursor: pointer; transition: .18s; position: relative; overflow: hidden;
+}
+.game-card:active { transform: scale(.96); border-color: var(--accent); }
+.gc-emoji { font-size: 34px; margin-bottom: 8px; display: block; }
+.gc-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.gc-sub { font-size: 11px; color: var(--text2); }
+.gc-badge {
+  position: absolute; top: 9px; right: 9px;
+  font-size: 9px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; letter-spacing: .3px;
+}
+.badge-hot { background: var(--red); color: #fff; }
+.badge-new { background: var(--green); color: #fff; }
+.badge-sale { background: var(--gold); color: #000; }
+
+/* PRODUCT ROWS */
+.prod-list { display: flex; flex-direction: column; gap: 8px; }
+.prod-row {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 13px 14px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: .15s;
+}
+.prod-row:active { background: var(--bg3); }
+.pr-emoji { font-size: 26px; flex-shrink: 0; }
+.pr-info { flex: 1; min-width: 0; }
+.pr-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pr-desc { font-size: 11px; color: var(--text2); }
+.pr-prices { text-align: right; flex-shrink: 0; }
+.pr-price { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; }
+.pr-old { font-size: 10px; color: var(--text3); text-decoration: line-through; }
+.pr-disc { font-size: 10px; color: var(--green); font-weight: 600; }
+
+/* FEATURED scroll */
+.featured-scroll {
+  display: flex; gap: 10px;
+  overflow-x: auto; scrollbar-width: none;
+  padding: 0 14px; margin: 0 -14px;
+}
+.featured-scroll::-webkit-scrollbar { display: none; }
+.feat-card {
+  flex-shrink: 0; width: 138px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  cursor: pointer; transition: .15s;
+}
+.feat-card:active { transform: scale(.95); }
+.feat-emoji { font-size: 34px; margin-bottom: 8px; display: block; }
+.feat-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
+.feat-price { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--accent2); }
+
+/* DETAIL PAGE */
+.detail-head {
+  background: linear-gradient(160deg, var(--bg3) 0%, var(--card) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 16px 24px; text-align: center;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  width: fit-content; cursor: pointer;
+  font-size: 13px; color: var(--text2);
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 12px; margin-bottom: 16px;
+  transition: .15s;
+}
+.back-btn:active { transform: scale(.95); }
+.det-emoji { font-size: 72px; margin-bottom: 12px; display: block; filter: drop-shadow(0 0 20px rgba(168,85,247,.4)); }
+.det-name { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.det-game { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.price-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.det-price { font-family: 'Rajdhani', sans-serif; font-size: 34px; font-weight: 700; color: var(--accent2); }
+.det-old { font-size: 17px; color: var(--text3); text-decoration: line-through; }
+.det-disc { background: var(--red); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.det-body { padding: 16px 14px; }
+.features { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; }
+.feat-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.feat-row:last-child { border-bottom: none; }
+.feat-row .ico { font-size: 18px; flex-shrink: 0; }
+.buy-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: none; border-radius: var(--radius);
+  padding: 16px; font-family: 'Rajdhani', sans-serif;
+  font-size: 19px; font-weight: 700; letter-spacing: 1.5px;
+  color: #fff; cursor: pointer;
+  box-shadow: 0 4px 24px rgba(124,58,237,.45);
+  transition: .15s;
+}
+.buy-btn:active { transform: scale(.98); }
+
+/* CART */
+.cart-page { padding: 14px; }
+.cart-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+.cart-empty { text-align: center; padding: 60px 20px; }
+.cart-empty-icon { font-size: 64px; opacity: .3; margin-bottom: 14px; }
+.cart-empty p { color: var(--text2); font-size: 15px; }
+.cart-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 13px; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ci-emoji { font-size: 26px; }
+.ci-info { flex: 1; }
+.ci-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.ci-price { font-size: 13px; color: var(--accent2); font-weight: 600; }
+.ci-del { background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.25); border-radius: 8px; padding: 7px 10px; color: var(--red); font-size: 14px; cursor: pointer; transition: .15s; }
+.ci-del:active { transform: scale(.9); }
+.cart-total { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; }
+.ct-label { font-size: 14px; color: var(--text2); }
+.ct-val { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; color: var(--accent2); }
+
+/* PROFILE */
+.profile-page { padding: 14px; }
+.prof-hero { background: linear-gradient(135deg, #1a0a3a, #0a1030, #0a1820); border: 1px solid #2a1a5a; border-radius: 20px; padding: 24px; text-align: center; margin-bottom: 12px; }
+.prof-ava { width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 10px; box-shadow: 0 4px 20px var(--glow); }
+.prof-name { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.prof-status { display: inline-block; background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.3); color: var(--gold); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.stats3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 8px; text-align: center; }
+.sb-val { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent2); }
+.sb-lbl { font-size: 10px; color: var(--text2); margin-top: 3px; }
+.ref-block { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.ref-block-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.ref-link-row { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.ref-link-text { flex: 1; font-size: 12px; color: var(--text2); word-break: break-all; }
+.ref-copy-btn { background: var(--accent); border: none; border-radius: 8px; padding: 7px 12px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; transition: .15s; }
+.ref-copy-btn:active { transform: scale(.93); }
+
+/* BOTTOM NAV */
+.bnav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,16,.97); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; z-index: 200; padding: 8px 0 18px; }
+.bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; transition: .15s; }
+.bn-item:active { transform: scale(.88); }
+.bn-icon { font-size: 22px; }
+.bn-label { font-size: 10px; color: var(--text3); font-weight: 500; }
+.bn-item.on .bn-label { color: var(--accent2); }
+.bn-item.on .bn-icon { filter: drop-shadow(0 0 8px var(--accent2)); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(14px); background: var(--green); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: .25s; z-index: 999; white-space: nowrap; pointer-events: none; }
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.au { animation: fadeUp .3s ease; }
+.mt14 { margin-top: 14px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text2); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="header" id="mainHeader">
+  <div class="header-row">
+    <div class="logo">GAME<span class="logo-dot">•</span>STORE</div>
+    <div class="icon-btn" onclick="goPage('cart')">🛒<div class="badge" id="cartBadge">0</div></div>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" placeholder="Поиск товаров..." id="searchInput" oninput="onSearch(this.value)">
+    <span class="search-icon">🔍</span>
+  </div>
+  <div class="tabs" id="mainTabs">
+    <div class="tab active" data-tab="all" onclick="switchTab('all',this)">🔥 Все</div>
+    <div class="tab" data-tab="games" onclick="switchTab('games',this)">🎮 Игры</div>
+    <div class="tab" data-tab="ai" onclick="switchTab('ai',this)">🤖 AI</div>
+    <div class="tab" data-tab="stream" onclick="switchTab('stream',this)">🎬 Стриминг</div>
+    <div class="tab" data-tab="fortnite" onclick="switchTab('fortnite',this)">⚡ Fortnite</div>
+    <div class="tab" data-tab="brawl" onclick="switchTab('brawl',this)">💎 Brawl Stars</div>
+    <div class="tab" data-tab="roblox" onclick="switchTab('roblox',this)">🟥 Roblox</div>
+    <div class="tab" data-tab="pubg" onclick="switchTab('pubg',this)">🔫 PUBG</div>
+    <div class="tab" data-tab="ml" onclick="switchTab('ml',this)">🌙 Mob.Legends</div>
+    <div class="tab" data-tab="coc" onclick="switchTab('coc',this)">🏰 Clash</div>
+    <div class="tab" data-tab="freef" onclick="switchTab('freef',this)">🔥 Free Fire</div>
+    <div class="tab" data-tab="cod" onclick="switchTab('cod',this)">🎖 COD Mobile</div>
+  </div>
+</div>
+
+<div class="page active" id="page-home">
+  <div class="hero au">
+    <div class="hero-tag">🔥 СКИДКИ ДО 35%</div>
+    <h2>Игровая валюта<br>и AI подписки</h2>
+    <p>Мгновенная выдача · ЮКасса · Поддержка 24/7</p>
+    <div class="hero-chips">
+      <div class="chip">⚡ Автовыдача</div>
+      <div class="chip">🔒 Безопасно</div>
+      <div class="chip">💳 ЮКасса</div>
+    </div>
+  </div>
+  <div id="tabContent"></div>
+</div>
+
+<div class="page" id="page-detail">
+  <div id="detailContent"></div>
+</div>
+
+<div class="page" id="page-cart">
+  <div class="cart-page">
+    <div class="cart-title">🛒 Корзина</div>
+    <div id="cartContent"></div>
+  </div>
+</div>
+
+<div class="page" id="page-profile">
+  <div class="profile-page" id="profileContent"></div>
+</div>
+
+<div class="bnav">
+  <div class="bn-item on" id="bn-home" onclick="goPage('home')"><div class="bn-icon">🏠</div><div class="bn-label">Главная</div></div>
+  <div class="bn-item" id="bn-catalog" onclick="switchTab('all',document.querySelector('[data-tab=all]'));goPage('home')"><div class="bn-icon">📦</div><div class="bn-label">Каталог</div></div>
+  <div class="bn-item" id="bn-cart" onclick="goPage('cart')"><div class="bn-icon">🛒</div><div class="bn-label">Корзина</div></div>
+  <div class="bn-item" id="bn-profile" onclick="goPage('profile')"><div class="bn-icon">👤</div><div class="bn-label">Профиль</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.expand(); tg.setHeaderColor('#080810'); tg.setBackgroundColor('#080810'); }
+const TG_USER = tg?.initDataUnsafe?.user || {first_name:'Гость', id:0};
+
+/* ── DATA ── */
+const CATS = {
+  games: [
+    { key:'fortnite', name:'Fortnite', sub:'V-Bucks', emoji:'⚡', badge:'ХИТ', btype:'badge-hot', items:[
+      {id:101,name:'1 000 V-Bucks',price:749,old:999,desc:'Стартовый набор — скин или эмоция'},
+      {id:102,name:'2 800 V-Bucks',price:1899,old:2499,desc:'Боевой пропуск + скин'},
+      {id:103,name:'5 000 V-Bucks',price:3299,old:4199,desc:'Большой выбор косметики'},
+      {id:104,name:'13 500 V-Bucks',price:7999,old:9999,desc:'Максимальный пак — скидка 20%'},
+    ]},
+    { key:'brawl', name:'Brawl Stars', sub:'Gems', emoji:'💎', badge:'', btype:'', items:[
+      {id:201,name:'80 Gems',price:349,old:499,desc:'На скин или несколько боксов'},
+      {id:202,name:'170 Gems',price:699,old:949,desc:'Стандартный набор'},
+      {id:203,name:'360 Gems',price:1399,old:1799,desc:'Пропуск + скин'},
+      {id:204,name:'950 Gems',price:3299,old:4299,desc:'Большой пак — самая выгодная цена'},
+    ]},
+    { key:'roblox', name:'Roblox', sub:'Robux', emoji:'🟥', badge:'', btype:'', items:[
+      {id:301,name:'400 Robux',price:299,old:399,desc:'На базовый аксессуар'},
+      {id:302,name:'800 Robux',price:549,old:749,desc:'Популярный пак'},
+      {id:303,name:'1 700 Robux',price:1099,old:1399,desc:'Большой набор'},
+      {id:304,name:'4 500 Robux',price:2599,old:3299,desc:'Максимум + Premium бонус'},
+    ]},
+    { key:'pubg', name:'PUBG Mobile', sub:'UC', emoji:'🔫', badge:'', btype:'', items:[
+      {id:401,name:'60 UC',price:99,old:149,desc:'Мини пополнение'},
+      {id:402,name:'325 UC',price:499,old:649,desc:'Royale Pass Chapter'},
+      {id:403,name:'660 UC',price:949,old:1249,desc:'Royale Pass + весь сезон'},
+      {id:404,name:'1 800 UC',price:2499,old:3199,desc:'Максимальный набор'},
+    ]},
+    { key:'ml', name:'Mobile Legends', sub:'Diamonds', emoji:'🌙', badge:'', btype:'', items:[
+      {id:501,name:'86 Diamonds',price:149,old:199,desc:'Расходники и улучшения'},
+      {id:502,name:'172 Diamonds',price:279,old:369,desc:'Стандартный набор'},
+      {id:503,name:'520 Diamonds',price:799,old:1049,desc:'Скин или Луна Пасс'},
+      {id:504,name:'1 060 Diamonds',price:1549,old:1999,desc:'Большой пак'},
+    ]},
+    { key:'coc', name:'Clash of Clans', sub:'Gems', emoji:'🏰', badge:'NEW', btype:'badge-new', items:[
+      {id:601,name:'500 Gems',price:299,old:399,desc:'Ускорение прогресса'},
+      {id:602,name:'1 200 Gems',price:649,old:849,desc:'Стандартный набор'},
+      {id:603,name:'2 500 Gems',price:1249,old:1649,desc:'Большой запас'},
+      {id:604,name:'6 500 Gems',price:2999,old:3999,desc:'Максимум — самая выгодная цена'},
+    ]},
+    { key:'freef', name:'Free Fire', sub:'Diamonds', emoji:'🔥', badge:'', btype:'', items:[
+      {id:701,name:'100 Diamonds',price:99,old:149,desc:'Мини набор'},
+      {id:702,name:'310 Diamonds',price:279,old:369,desc:'Стандарт'},
+      {id:703,name:'520 Diamonds',price:449,old:599,desc:'Популярный набор'},
+      {id:704,name:'1 060 Diamonds',price:849,old:1099,desc:'Большой пак'},
+    ]},
+    { key:'cod', name:'COD Mobile', sub:'CP', emoji:'🎖', badge:'', btype:'', items:[
+      {id:801,name:'80 CP',price:99,old:149,desc:'Мини набор'},
+      {id:802,name:'400 CP',price:449,old:599,desc:'Сезонный пропуск'},
+      {id:803,name:'800 CP',price:849,old:1099,desc:'Скин + пропуск'},
+      {id:804,name:'2 000 CP',price:1999,old:2599,desc:'Максимальный пак'},
+    ]},
+  ],
+  ai: [
+    { key:'chatgpt', name:'ChatGPT Plus', sub:'1 месяц', emoji:'🤖', badge:'ХИТ', btype:'badge-hot', items:[
+      {id:1001,name:'ChatGPT Plus 1 мес',price:1699,old:2099,desc:'GPT-4o, DALL-E 3, анализ файлов, без лимитов'},
+    ]},
+    { key:'claude', name:'Claude Pro', sub:'1 месяц', emoji:'🧠', badge:'', btype:'', items:[
+      {id:1101,name:'Claude Pro 1 мес',price:1599,old:1999,desc:'Claude 3.5 Sonnet без лимитов, приоритет'},
+    ]},
+    { key:'midj', name:'Midjourney', sub:'Подписка', emoji:'🎨', badge:'', btype:'', items:[
+      {id:1201,name:'Midjourney Basic 1 мес',price:999,old:1299,desc:'200 генераций, коммерческое использование'},
+      {id:1202,name:'Midjourney Standard 1 мес',price:1799,old:2299,desc:'Без лимита + Relax режим'},
+    ]},
+    { key:'canva', name:'Canva Pro', sub:'1 месяц', emoji:'✏️', badge:'NEW', btype:'badge-new', items:[
+      {id:1301,name:'Canva Pro 1 мес',price:599,old:849,desc:'Все шаблоны, фоновый ластик, Brand Kit'},
+      {id:1302,name:'Canva Pro 3 мес',price:1499,old:2199,desc:'Выгодный пак на 3 месяца'},
+    ]},
+    { key:'notion', name:'Notion AI', sub:'1 месяц', emoji:'📝', badge:'', btype:'', items:[
+      {id:1401,name:'Notion AI 1 мес',price:499,old:699,desc:'AI в Notion — суммаризация и генерация текста'},
+    ]},
+    { key:'adobe', name:'Adobe CC', sub:'1 месяц', emoji:'🅰️', badge:'', btype:'', items:[
+      {id:1501,name:'Adobe Creative Cloud 1 мес',price:2499,old:3299,desc:'Photoshop, Illustrator, Premiere и все приложения'},
+    ]},
+  ],
+  stream: [
+    { key:'spotify', name:'Spotify Premium', sub:'Подписка', emoji:'🎵', badge:'', btype:'', items:[
+      {id:2001,name:'Spotify Premium 1 мес',price:299,old:399,desc:'Без рекламы, оффлайн, высокое качество'},
+      {id:2002,name:'Spotify Premium 3 мес',price:749,old:1049,desc:'Самый выгодный пак'},
+    ]},
+    { key:'yt', name:'YouTube Premium', sub:'Подписка', emoji:'▶️', badge:'ХИТ', btype:'badge-hot', items:[
+      {id:2101,name:'YouTube Premium 1 мес',price:349,old:499,desc:'Без рекламы, фоновый режим, YouTube Music'},
+      {id:2102,name:'YouTube Premium 3 мес',price:899,old:1349,desc:'Выгодный пак на 3 месяца'},
+    ]},
+    { key:'applemus', name:'Apple Music', sub:'Подписка', emoji:'🍎', badge:'', btype:'', items:[
+      {id:2201,name:'Apple Music 1 мес',price:299,old:399,desc:'90M+ треков, Dolby Atmos, без рекламы'},
+      {id:2202,name:'Apple Music 3 мес',price:749,old:1049,desc:'Выгодный пак'},
+    ]},
+    { key:'duol', name:'Duolingo Super', sub:'Подписка', emoji:'🦉', badge:'NEW', btype:'badge-new', items:[
+      {id:2301,name:'Duolingo Super 1 мес',price:399,old:549,desc:'Без рекламы, безлимит жизней'},
+      {id:2302,name:'Duolingo Super 3 мес',price:999,old:1499,desc:'Выгодный пак'},
+    ]},
+  ]
+};
+
+/* flat map */
+const ALL_ITEMS = [], ITEM_MAP = {}, GAME_MAP = {};
+Object.values(CATS).flat().forEach(g => {
+  GAME_MAP[g.key] = g;
+  g.items.forEach(it => { it._g = g; ALL_ITEMS.push(it); ITEM_MAP[it.id] = it; });
+});
+
+/* ── CART ── */
+let cart = [];
+function cartTotal(){ return cart.reduce((s,i)=>s+i.price,0); }
+function updateBadge(){
+  const el=document.getElementById('cartBadge');
+  cart.length ? (el.textContent=cart.length,el.classList.add('on')) : el.classList.remove('on');
+}
+function addToCart(id){
+  const it=ITEM_MAP[id]; if(!it) return;
+  cart.push({id,name:it.name,price:it.price,emoji:it._g.emoji});
+  updateBadge(); showToast('✅ Добавлено в корзину!');
+}
+function removeFromCart(i){ cart.splice(i,1); updateBadge(); renderCart(); }
+
+/* ── TOAST ── */
+let tt;
+function showToast(msg,c='#10b981'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.background=c; el.classList.add('on');
+  clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('on'),2200);
+}
+
+/* ── HELPERS ── */
+function disc(p,o){ return Math.round((1-p/o)*100); }
+function fmt(n){ return n.toLocaleString('ru'); }
+
+function gcHtml(g){
+  return `<div class="game-card" onclick="openGameTab('${g.key}')">
+    ${g.badge?`<div class="gc-badge ${g.btype}">${g.badge}</div>`:''}
+    <span class="gc-emoji">${g.emoji}</span>
+    <div class="gc-name">${g.name}</div>
+    <div class="gc-sub">${g.sub}</div>
+  </div>`;
+}
+function prHtml(it){
+  return `<div class="prod-row" onclick="openDetail(${it.id})">
+    <div class="pr-emoji">${it._g.emoji}</div>
+    <div class="pr-info"><div class="pr-name">${it.name}</div><div class="pr-desc">${it.desc}</div></div>
+    <div class="pr-prices">
+      <div class="pr-price">${fmt(it.price)}₽</div>
+      <div class="pr-old">${fmt(it.old)}₽</div>
+      <div class="pr-disc">-${disc(it.price,it.old)}%</div>
+    </div>
+  </div>`;
+}
+function fcHtml(it){
+  return `<div class="feat-card" onclick="openDetail(${it.id})">
+    <span class="feat-emoji">${it._g.emoji}</span>
+    <div class="feat-name">${it.name}</div>
+    <div class="feat-price">${fmt(it.price)}₽</div>
+  </div>`;
+}
+
+/* ── TABS / RENDER ── */
+let activeTab='all';
+function switchTab(tab,el){
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderTab();
+  if(currentPage!=='home') goPage('home');
+}
+function renderTab(){
+  const el=document.getElementById('tabContent');
+  const hot=ALL_ITEMS.filter((_,i)=>i%3===0).slice(0,8);
+  if(activeTab==='all'){
+    el.innerHTML=`
+      <div class="section mt14 au"><div class="sec-head"><div class="sec-title">🔥 Популярное</div></div>
+        <div class="featured-scroll">${hot.map(fcHtml).join('')}</div></div>
+      <div class="section mt14 au"><div class="sec-head"><div class="sec-title">🎮 Игровая валюта</div>
+        <div class="sec-all" onclick="switchTab('games',document.querySelector('[data-tab=games]'))">Все →</div></div>
+        <div class="grid2">${CATS.games.map(gcHtml).join('')}</div></div>
+      <div class="section mt14 au"><div class="sec-head"><div class="sec-title">🤖 AI подписки</div>
+        <div class="sec-all" onclick="switchTab('ai',document.querySelector('[data-tab=ai]'))">Все →</div></div>
+        <div class="grid2">${CATS.ai.map(gcHtml).join('')}</div></div>
+      <div class="section mt14 au"><div class="sec-head"><div class="sec-title">🎬 Стриминг</div>
+        <div class="sec-all" onclick="switchTab('stream',document.querySelector('[data-tab=stream]'))">Все →</div></div>
+        <div class="grid2">${CATS.stream.map(gcHtml).join('')}</div></div>
+      <div style="height:8px"></div>`;
+    return;
+  }
+  if(activeTab==='games'){ el.innerHTML=`<div class="section mt14 au"><div class="sec-title" style="margin-bottom:12px">🎮 Игровая валюта</div><div class="grid2">${CATS.games.map(gcHtml).join('')}</div></div>`; return; }
+  if(activeTab==='ai'){ el.innerHTML=`<div class="section mt14 au"><div class="sec-title" style="margin-bottom:12px">🤖 AI Подписки</div><div class="grid2">${CATS.ai.map(gcHtml).join('')}</div></div>`; return; }
+  if(activeTab==='stream'){ el.innerHTML=`<div class="section mt14 au"><div class="sec-title" style="margin-bottom:12px">🎬 Стриминг</div><div class="grid2">${CATS.stream.map(gcHtml).join('')}</div></div>`; return; }
+  const g=GAME_MAP[activeTab];
+  if(g){ el.innerHTML=`<div class="section mt14 au"><div class="sec-head"><div class="sec-title">${g.emoji} ${g.name}</div></div><div class="prod-list">${g.items.map(prHtml).join('')}</div></div>`; return; }
+  el.innerHTML='';
+}
+
+function openGameTab(key){
+  const tabEl=document.querySelector(`[data-tab="${key}"]`);
+  if(tabEl){ switchTab(key,tabEl); return; }
+  activeTab=key;
+  document.getElementById('tabContent').innerHTML=`<div class="section mt14 au"><div class="prod-list">${(GAME_MAP[key]?.items||[]).map(prHtml).join('')}</div></div>`;
+  goPage('home');
+}
+
+/* ── SEARCH ── */
+function onSearch(val){
+  if(!val.trim()){ renderTab(); return; }
+  const q=val.toLowerCase();
+  const found=ALL_ITEMS.filter(it=>it.name.toLowerCase().includes(q)||it.desc.toLowerCase().includes(q)||it._g.name.toLowerCase().includes(q));
+  const el=document.getElementById('tabContent');
+  el.innerHTML=found.length
+    ?`<div class="section mt14 au"><div class="sec-title" style="margin-bottom:12px">Результаты поиска (${found.length})</div><div class="prod-list">${found.map(prHtml).join('')}</div></div>`
+    :`<div class="empty-state">🔍 Ничего не найдено по «${val}»</div>`;
+}
+
+/* ── DETAIL ── */
+function openDetail(id){
+  const it=ITEM_MAP[id]; if(!it) return;
+  const g=it._g, d=disc(it.price,it.old);
+  document.getElementById('detailContent').innerHTML=`
+  <div class="au">
+    <div class="detail-head">
+      <div class="back-btn" onclick="goPage('home')">← Назад</div>
+      <span class="det-emoji">${g.emoji}</span>
+      <div class="det-name">${it.name}</div>
+      <div class="det-game">${g.name} · ${g.sub}</div>
+      <div class="price-row">
+        <div class="det-price">${fmt(it.price)}₽</div>
+        <div class="det-old">${fmt(it.old)}₽</div>
+        <div class="det-disc">-${d}%</div>
+      </div>
+    </div>
+    <div class="det-body">
+      <div class="features">
+        <div class="feat-row"><span class="ico">⚡</span><span>Мгновенная автовыдача после оплаты</span></div>
+        <div class="feat-row"><span class="ico">🔒</span><span>Безопасная оплата через ЮКассу</span></div>
+        <div class="feat-row"><span class="ico">💬</span><span>Поддержка 24/7 — ответим за 30 минут</span></div>
+        <div class="feat-row"><span class="ico">✅</span><span>Гарантия возврата при проблемах</span></div>
+        <div class="feat-row"><span class="ico">📋</span><span>${it.desc}</span></div>
+      </div>
+      <button class="buy-btn" onclick="addToCart(${id});goPage('cart')">💳 КУПИТЬ ЗА ${fmt(it.price)}₽</button>
+    </div>
+  </div>`;
+  goPage('detail');
+}
+
+/* ── CART RENDER ── */
+function renderCart(){
+  const el=document.getElementById('cartContent');
+  if(!cart.length){ el.innerHTML=`<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Корзина пуста</p></div>`; return; }
+  const total=cartTotal();
+  el.innerHTML=cart.map((item,i)=>`
+    <div class="cart-item">
+      <div class="ci-emoji">${item.emoji}</div>
+      <div class="ci-info"><div class="ci-name">${item.name}</div><div class="ci-price">${fmt(item.price)}₽</div></div>
+      <div class="ci-del" onclick="removeFromCart(${i})">✕</div>
+    </div>`).join('')+`
+  <div class="cart-total"><div class="ct-label">Итого:</div><div class="ct-val">${fmt(total)}₽</div></div>
+  <button class="buy-btn" onclick="checkout()">💳 ОПЛАТИТЬ ${fmt(total)}₽</button>`;
+}
+function checkout(){
+  if(tg) tg.sendData(JSON.stringify({action:'checkout',cart,total:cartTotal()}));
+  showToast('🚀 Переходим к оплате...');
+}
+
+/* ── PROFILE ── */
+function renderProfile(){
+  const botUsername='gamestore_bot';
+  const refLink=`https://t.me/${botUsername}?start=REF${TG_USER.id}`;
+  document.getElementById('profileContent').innerHTML=`
+  <div class="prof-hero au"><div class="prof-ava">👤</div>
+    <div class="prof-name">${TG_USER.first_name}</div>
+    <div class="prof-status">🥉 Новичок</div></div>
+  <div class="stats3 au">
+    <div class="stat-box"><div class="sb-val">0</div><div class="sb-lbl">Заказов</div></div>
+    <div class="stat-box"><div class="sb-val">0₽</div><div class="sb-lbl">Потрачено</div></div>
+    <div class="stat-box"><div class="sb-val">0</div><div class="sb-lbl">Рефералов</div></div>
+  </div>
+  <div class="ref-block au"><div class="ref-block-title">👥 Реферальная программа</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">Приглашай друзей — получай бонусы за каждого!</p>
+    <div class="ref-link-row" onclick="copyRef('${refLink}')">
+      <div class="ref-link-text">${refLink}</div>
+      <button class="ref-copy-btn">Копировать</button>
+    </div></div>
+  <div class="sec-title au" style="margin:12px 0 10px">📦 История заказов</div>
+  <div class="empty-state au">Заказов пока нет 🎮</div>`;
+}
+function copyRef(link){ navigator.clipboard?.writeText(link); showToast('🔗 Ссылка скопирована!'); }
+
+/* ── NAV ── */
+let currentPage='home';
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('active');
+  const bn=document.getElementById('bn-'+name); if(bn) bn.classList.add('on');
+  document.getElementById('mainHeader').style.display=name==='home'?'':'none';
+  if(name==='cart') renderCart();
+  if(name==='profile') renderProfile();
+  currentPage=name; window.scrollTo(0,0);
+}
+
+/* ── INIT ── */
+renderTab();
+updateBadge();
+</script>
+</body>
+</html>
