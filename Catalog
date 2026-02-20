@@ -1,0 +1,286 @@
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from payment import PaypalichPayment
+import aiosqlite
+
+router = Router()
+
+
+@router.message(F.text == "🛍 Каталог")
+async def catalog(message: Message, db):
+    games = await db.get_games_list()
+    subs = await db.get_subscriptions_list()
+
+    text = "🛍 <b>Каталог товаров</b>\n\nВыбери категорию:"
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎮 Игровая валюта", callback_data="cat_games")],
+        [InlineKeyboardButton(text="🤖 AI подписки", callback_data="cat_ai")],
+        [InlineKeyboardButton(text="🎵 Музыка и стриминг", callback_data="cat_stream")],
+    ])
+    await message.answer(text, reply_markup=kb, parse_mode="HTML")
+
+
+@router.callback_query(F.data == "open_catalog")
+async def open_catalog_cb(callback: CallbackQuery):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🎮 Игровая валюта", callback_data="cat_games")],
+        [InlineKeyboardButton(text="🤖 AI подписки", callback_data="cat_ai")],
+        [InlineKeyboardButton(text="🎵 Музыка и стриминг", callback_data="cat_stream")],
+    ])
+    await callback.message.edit_text("🛍 <b>Каталог товаров</b>\n\nВыбери категорию:", reply_markup=kb, parse_mode="HTML")
+
+
+@router.callback_query(F.data == "cat_games")
+async def cat_games(callback: CallbackQuery, db):
+    games = await db.get_games_list()
+    buttons = [[InlineKeyboardButton(text=f"🎮 {g}", callback_data=f"game_{g}")] for g in games]
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="open_catalog")])
+    await callback.message.edit_text(
+        "🎮 <b>Игровая валюта</b>\n\nДоступные игры:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
+        parse_mode="HTML"
+    )
+
+
+@router.callback_query(F.data == "cat_ai")
+async def cat_ai(callback: CallbackQuery, db):
+    subs = await db.get_subscriptions_by_category("subscription")
+    buttons = [[InlineKeyboardButton(text=f"✨ {s}", callback_data=f"sub_{s}")] for s in subs]
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="open_catalog")])
+    await callback.message.edit_text(
+        "🤖 <b>AI подписки</b>\n\nВыбери сервис:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
+        parse_mode="HTML"
+    )
+
+
+@router.callback_query(F.data == "cat_stream")
+async def cat_stream(callback: CallbackQuery, db):
+    subs = await db.get_subscriptions_by_category("streaming")
+    buttons = [[InlineKeyboardButton(text=f"🎵 {s}", callback_data=f"stream_{s}")] for s in subs]
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="open_catalog")])
+    await callback.message.edit_text(
+        "🎵 <b>Музыка и стриминг</b>\n\nВыбери сервис:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
+        parse_mode="HTML"
+    )
+
+
+async def _show_products(callback: CallbackQuery, db, game: str, back_cb: str):
+    products = await db.get_products(game=game)
+    if not products:
+        await callback.answer("Товаров пока нет!", show_alert=True)
+        return
+
+    EMOJIS = {"Fortnite": "⚡", "Brawl Stars": "💎", "ChatGPT Plus": "🤖", "Claude Pro": "🧠",
+               "Midjourney": "🎨", "Grok Premium": "✦", "Perplexity Pro": "🔍",
+               "GitHub Copilot": "🐙", "Cursor AI": "🖱️", "Canva Pro": "✏️",
+               "Adobe CC": "🅰️", "Spotify": "🎵", "YouTube": "▶️",
+               "Apple Music": "🍎", "Tidal HiFi": "🌊"}
+    emoji = EMOJIS.get(game, "✨")
+
+    buttons = []
+    for p in products:
+        disc = int((1 - p["price"] / p["original_price"]) * 100) if p.get("original_price") else 0
+        disc_txt = f" 🔥−{disc}%" if disc else ""
+        buttons.append([InlineKeyboardButton(
+            text=f"{p['name']} — {int(p['price'])}₽{disc_txt}",
+            callback_data=f"product_{p['id']}"
+        )])
+    buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data=back_cb)])
+
+    await callback.message.edit_text(
+        f"{emoji} <b>{game}</b>\n\nВыбери пакет:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
+        parse_mode="HTML"
+    )
+
+
+@router.callback_query(F.data.startswith("game_"))
+async def show_game(callback: CallbackQuery, db):
+    game = callback.data[5:]
+    await _show_products(callback, db, game, "cat_games")
+
+
+@router.callback_query(F.data.startswith("sub_"))
+async def show_sub(callback: CallbackQuery, db):
+    game = callback.data[4:]
+    await _show_products(callback, db, game, "cat_ai")
+
+
+@router.callback_query(F.data.startswith("stream_"))
+async def show_stream(callback: CallbackQuery, db):
+    game = callback.data[7:]
+    await _show_products(callback, db, game, "cat_stream")
+
+
+@router.callback_query(F.data.startswith("product_"))
+async def show_product(callback: CallbackQuery, db):
+    product_id = int(callback.data[8:])
+    product = await db.get_product(product_id)
+    if not product:
+        await callback.answer("Товар не найден!", show_alert=True)
+        return
+
+    available = await db.count_available_keys(product_id)
+    stock = f"✅ В наличии: {available} шт." if available > 0 else "⚠️ Уточните наличие у поддержки"
+
+    disc = ""
+    if product.get("original_price"):
+        pct = int((1 - product["price"] / product["original_price"]) * 100)
+        disc = f"\n~~{int(product['original_price'])}₽~~ → скидка {pct}%"
+
+    back_map = {"game": "cat_games", "subscription": "cat_ai", "streaming": "cat_stream"}
+    back_cb = back_map.get(product["category"], "open_catalog")
+
+    text = (
+        f"{product['emoji']} <b>{product['name']}</b>\n"
+        f"🏷 {product['game']}\n\n"
+        f"{product.get('description', '')}\n\n"
+        f"💰 Цена: <b>{int(product['price'])}₽</b>{disc}\n"
+        f"{stock}\n\n"
+        f"💳 Оплата: СБП или карта РФ (Paypalich)\n"
+        f"⚡ Выдача мгновенно после оплаты"
+    )
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📲 Оплатить через СБП", callback_data=f"buy_{product_id}_sbp")],
+        [InlineKeyboardButton(text="💳 Оплатить картой РФ", callback_data=f"buy_{product_id}_card")],
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data=back_cb)],
+    ])
+    await callback.message.edit_text(text, reply_markup=kb, parse_mode="HTML")
+
+
+@router.callback_query(F.data.startswith("buy_"))
+async def buy_product(callback: CallbackQuery, db, config):
+    parts = callback.data.split("_")
+    # format: buy_{product_id}_{method}
+    product_id = int(parts[1])
+    pay_method = parts[2] if len(parts) > 2 else "sbp"
+
+    product = await db.get_product(product_id)
+    if not product:
+        await callback.answer("Товар не найден!", show_alert=True)
+        return
+
+    available = await db.count_available_keys(product_id)
+    if available == 0:
+        await callback.answer("⚠️ Товар временно недоступен. Напиши в поддержку!", show_alert=True)
+        return
+
+    # Create order first
+    order_id = await db.create_order(
+        user_id=callback.from_user.id,
+        product_id=product_id,
+        amount=product["price"],
+        payment_id="pending"
+    )
+
+    # Create Paypalich invoice
+    paypalich = PaypalichPayment(config.PAYPALICH_SHOP_ID, config.PAYPALICH_SECRET)
+    method_label = "СБП" if pay_method == "sbp" else "карта РФ"
+
+    result = await paypalich.create_invoice(
+        order_id=order_id,
+        amount=product["price"],
+        description=f"GameStore: {product['name']}",
+        pay_method=pay_method,
+        success_url=f"https://t.me/{(await callback.bot.me()).username}"
+    )
+
+    if not result:
+        await callback.answer("❌ Ошибка создания платежа. Попробуй позже!", show_alert=True)
+        return
+
+    payment_id = result["payment_id"]
+    payment_url = result["payment_url"]
+
+    # Update order with payment_id
+    async with aiosqlite.connect(config.DB_PATH) as conn:
+        await conn.execute("UPDATE orders SET payment_id=? WHERE id=?", (payment_id, order_id))
+        await conn.commit()
+
+    method_icon = "📲" if pay_method == "sbp" else "💳"
+
+    await callback.message.edit_text(
+        f"{method_icon} <b>Оплата через {method_label}</b>\n\n"
+        f"{product['emoji']} {product['name']}\n"
+        f"💰 Сумма: <b>{int(product['price'])}₽</b>\n\n"
+        f"1. Нажми кнопку ниже для перехода к оплате\n"
+        f"2. Оплати удобным способом\n"
+        f"3. Нажми «Проверить оплату» — получишь товар\n\n"
+        f"⏱ Ссылка действует 30 минут\n"
+        f"🔒 Безопасно · защищено Paypalich",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text=f"{method_icon} Перейти к оплате", url=payment_url)],
+            [InlineKeyboardButton(text="✅ Проверить оплату", callback_data=f"checkpay_{order_id}")],
+            [InlineKeyboardButton(text="❌ Отмена", callback_data="open_catalog")],
+        ]),
+        parse_mode="HTML"
+    )
+
+
+@router.callback_query(F.data.startswith("checkpay_"))
+async def check_payment(callback: CallbackQuery, db, config):
+    order_id = int(callback.data[9:])
+    order = await db.get_order(order_id)
+
+    if not order or order["user_id"] != callback.from_user.id:
+        await callback.answer("Заказ не найден!", show_alert=True)
+        return
+
+    if order["status"] == "completed":
+        await callback.answer("✅ Этот заказ уже выполнен!", show_alert=True)
+        return
+
+    if order["payment_id"] == "pending":
+        await callback.answer("⏳ Платёж ещё не создан. Попробуй снова.", show_alert=True)
+        return
+
+    paypalich = PaypalichPayment(config.PAYPALICH_SHOP_ID, config.PAYPALICH_SECRET)
+    paid = await paypalich.is_paid(order["payment_id"])
+
+    if not paid:
+        await callback.answer("⏳ Оплата пока не поступила. Подожди немного и проверь снова!", show_alert=True)
+        return
+
+    await _deliver_order(callback, db, config, order_id, callback.from_user.id, order["product_id"])
+
+
+async def _deliver_order(callback, db, config, order_id, user_id, product_id):
+    key = await db.get_available_key(product_id)
+    product = await db.get_product(product_id)
+    await db.complete_order(order_id)
+
+    if key:
+        await db.use_key(key["id"], order_id)
+        text = (
+            f"✅ <b>Заказ #{order_id} выполнен!</b>\n\n"
+            f"{product['emoji']} <b>{product['name']}</b>\n\n"
+            f"🔑 Твой код:\n"
+            f"<code>{key['key_value']}</code>\n\n"
+            f"Нажми на код чтобы скопировать!\n"
+            f"Спасибо за покупку! 🎮"
+        )
+    else:
+        text = (
+            f"✅ <b>Оплата получена! Заказ #{order_id}</b>\n\n"
+            f"{product['emoji']} <b>{product['name']}</b>\n\n"
+            f"⏳ Товар будет доставлен в течение 15 минут.\n"
+            f"Вопросы: {config.SUPPORT_USERNAME}"
+        )
+        for admin_id in config.ADMIN_IDS:
+            try:
+                await callback.bot.send_message(
+                    admin_id,
+                    f"⚠️ <b>РУЧНАЯ ВЫДАЧА</b>\n\n"
+                    f"Заказ: #{order_id}\n"
+                    f"Товар: {product['name']}\n"
+                    f"Покупатель: {user_id}\n\n"
+                    f"Нет ключей в базе! Добавь через /admin",
+                    parse_mode="HTML"
+                )
+            except:
+                pass
+
+    await callback.message.edit_text(text, parse_mode="HTML")
