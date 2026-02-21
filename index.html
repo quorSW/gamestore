@@ -424,7 +424,7 @@ function validatePromo(code, statusEl, onOk) {
   }
   if (!promoLooksValid(code)) {
     statusEl.className = 'promo-status promo-err';
-    statusEl.textContent = '❌ Неверный формат. Пример: COSMIC10_XXXX';
+    statusEl.textContent = '❌ Неверный формат. Пример: COSMIC10_FW1A0Z';
     return;
   }
   const d = promoDiscount(code);
@@ -662,7 +662,7 @@ function renderCart() {
     <div class="cart-promo">
       <div class="cart-promo-title">🎁 Промокод</div>
       <div class="promo-row">
-        <input class="promo-input" id="cartPromoInput" placeholder="COSMIC10_XXXXX1" value="${cartPromo.code}" maxlength="16">
+        <input class="promo-input" id="cartPromoInput" placeholder="COSMIC10_XXXXXX" value="${cartPromo.code}" maxlength="16">
         <button class="promo-apply" id="btnCartPromo">Применить</button>
       </div>
       <div class="promo-status ${cartPromo.discount ? 'promo-ok' : ''}" id="cartPromoStatus"
