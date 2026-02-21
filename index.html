@@ -1,834 +1,886 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GameStore</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💰 Cosmic Clicker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="config.js"></script>
+  <style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
-  --bg:#09090f; --bg2:#0f0f1a; --bg3:#161625; --card:#121220;
-  --border:#22223a; --border2:#2e2e48;
-  --accent:#7c3aed; --accent2:#a855f7; --glow:rgba(124,58,237,.28);
-  --gold:#f59e0b; --green:#10b981; --red:#ef4444; --blue:#3b82f6;
-  --text:#f0f0fa; --text2:#8080a0; --text3:#404060; --r:16px;
+  --bg: #0a0a12; --surface: #13131d; --accent: #ffd700; --text: #ffffff;
+  --muted: #5a5a6e; --success: #00ff88; --border: rgba(255,215,0,0.15);
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;padding-bottom:82px}
-
-/* ─── HEADER ─── */
-.hdr{background:rgba(9,9,15,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:13px 16px 0;position:sticky;top:0;z-index:100}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
-.logo{font-family:'Rajdhani',sans-serif;font-size:21px;font-weight:700;letter-spacing:3px;background:linear-gradient(90deg,#c084fc,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo em{-webkit-text-fill-color:var(--gold);font-style:normal}
-.hdr-right{display:flex;gap:8px}
-.ico-btn{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:7px 11px;font-size:17px;cursor:pointer;transition:.15s;position:relative}
-.ico-btn:active{transform:scale(.9)}
-.cbadge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center}
-.cbadge.v{display:flex}
-/* catalog tabs */
-.htabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:10px}
-.htabs::-webkit-scrollbar{display:none}
-.htab{flex-shrink:0;padding:6px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:.2s;white-space:nowrap}
-.htab.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 14px var(--glow)}
-
-/* ─── PAGES ─── */
-.page{display:none}.page.on{display:block}
-
-/* ─── HOME ─── */
-.hero{margin:14px 14px 0;background:linear-gradient(135deg,#1e0a48 0%,#0c1038 55%,#091828 100%);border:1px solid #2a185a;border-radius:20px;padding:22px 20px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-70px;right:-50px;width:220px;height:220px;background:radial-gradient(circle,rgba(124,58,237,.38),transparent 70%);border-radius:50%;pointer-events:none}
-.hero-tag{display:inline-block;background:linear-gradient(90deg,#f59e0b,#f97316);color:#000;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:.5px}
-.hero h2{font-family:'Rajdhani',sans-serif;font-size:25px;font-weight:700;line-height:1.2;margin-bottom:8px;background:linear-gradient(135deg,#fff 40%,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{font-size:12px;color:var(--text2);line-height:1.65}
-.hero-chips{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text2)}
-.home-stats{display:flex;gap:8px;padding:14px 14px 0}
-.hstat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 10px;text-align:center}
-.hstat-val{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--accent2)}
-.hstat-lbl{font-size:10px;color:var(--text2);margin-top:2px}
-.hiw{margin:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px}
-.hiw-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px}
-.hiw-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
-.hiw-step:last-child{margin-bottom:0}
-.step-num{background:var(--accent);color:#fff;font-size:11px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.step-txt{font-size:13px;line-height:1.5;color:var(--text2)}
-.step-txt b{color:var(--text)}
-/* featured scroll */
-.feat-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:0 14px}
-.feat-scroll::-webkit-scrollbar{display:none}
-.fc{flex-shrink:0;width:135px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:.15s}
-.fc:active{transform:scale(.95);border-color:var(--accent)}
-.fc-emoji{font-size:30px;margin-bottom:8px;display:block}
-.fc-name{font-size:12px;font-weight:600;margin-bottom:4px;line-height:1.3}
-.fc-price{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--accent2)}
-
-/* ─── CATALOG ─── */
-.cat-page{padding:14px}
-.cat-page-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:14px}
-.cat-block{margin-bottom:22px}
-.cat-bhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.cat-btitle{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700}
-.cat-bcnt{font-size:11px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:3px 9px;border-radius:20px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
-.gcard:active{transform:scale(.96);border-color:var(--accent)}
-.gc-emoji{font-size:34px;margin-bottom:8px;display:block}
-.gc-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.gc-sub{font-size:11px;color:var(--text2)}
-.gc-badge{position:absolute;top:9px;right:9px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px}
-.bh{background:var(--red);color:#fff}.bn{background:var(--green);color:#fff}
-
-/* ─── ITEMS LIST ─── */
-.items-page{padding:14px}
-.back-btn{display:flex;align-items:center;gap:6px;width:fit-content;cursor:pointer;font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:7px 12px;margin-bottom:14px;transition:.15s}
-.back-btn:active{transform:scale(.95)}
-.items-hdr{background:linear-gradient(135deg,var(--bg3),var(--card));border:1px solid var(--border);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:14px}
-.ih-emoji{font-size:52px;margin-bottom:10px;display:block;filter:drop-shadow(0 0 14px rgba(168,85,247,.35))}
-.ih-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
-.ih-desc{font-size:13px;color:var(--text2);line-height:1.5}
-.prod-list{display:flex;flex-direction:column;gap:8px}
-.prow{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;cursor:pointer;transition:.15s}
-.prow:active{background:var(--bg3)}
-.prow-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.pr-left{flex:1;min-width:0}
-.pr-name{font-size:14px;font-weight:600;margin-bottom:2px}
-.pr-info{font-size:11px;color:var(--text2)}
-.pr-right{text-align:right;flex-shrink:0}
-.pr-price{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700}
-.pr-old{font-size:10px;color:var(--text3);text-decoration:line-through}
-.pr-disc{font-size:10px;color:var(--green);font-weight:600}
-.prow-btns{display:flex;gap:8px}
-.btn-buy{flex:1;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;padding:9px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.5px;color:#fff;cursor:pointer;transition:.15s}
-.btn-buy:active{transform:scale(.97)}
-.btn-cart{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:16px;cursor:pointer;transition:.15s}
-.btn-cart:active{transform:scale(.93)}
-.btn-cart.added{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4)}
-
-/* ─── DETAIL ─── */
-.det-head{background:linear-gradient(160deg,var(--bg3),var(--card));border-bottom:1px solid var(--border);padding:20px 16px 22px;text-align:center}
-.det-emoji{font-size:68px;margin-bottom:12px;display:block;filter:drop-shadow(0 0 18px rgba(168,85,247,.4))}
-.det-name{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px}
-.det-cat{font-size:13px;color:var(--text2);margin-bottom:16px}
-.price-row{display:flex;align-items:center;justify-content:center;gap:10px}
-.det-price{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--accent2)}
-.det-old{font-size:16px;color:var(--text3);text-decoration:line-through}
-.det-disc{background:var(--red);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
-.det-body{padding:16px 14px}
-.feats{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px}
-.frow{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5}
-.frow:last-child{border-bottom:none}
-.frow .ico{font-size:17px;flex-shrink:0;margin-top:1px}
-/* promo input */
-.promo-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.promo-title{font-size:13px;font-weight:600;margin-bottom:10px}
-.promo-row{display:flex;gap:8px}
-.promo-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;transition:.2s;text-transform:uppercase}
-.promo-input:focus{border-color:var(--accent)}
-.promo-input::placeholder{color:var(--text3);text-transform:none}
-.promo-apply{background:var(--accent);border:none;border-radius:10px;padding:9px 14px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:.15s}
-.promo-apply:active{transform:scale(.93)}
-.promo-result{margin-top:8px;font-size:12px;padding:8px 10px;border-radius:8px;display:none}
-.promo-ok{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green)}
-.promo-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red)}
-/* pay methods */
-.pay-opts{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
-.pay-title{font-size:13px;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--border)}
-.pay-methods{display:flex}
-.pay-method{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 8px;cursor:pointer;transition:.15s;border-right:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text2)}
-.pay-method:last-child{border-right:none}
-.pay-method.sel{background:rgba(124,58,237,.12);color:var(--accent2)}
-.pay-method:active{transform:scale(.95)}
-.pay-ico{font-size:22px}
-/* final price */
-.final-price{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.fp-lbl{font-size:13px;color:var(--text2)}
-.fp-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--accent2)}
-.det-btns{display:flex;gap:10px}
-.buy-btn{flex:1;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:var(--r);padding:15px;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;color:#fff;cursor:pointer;box-shadow:0 4px 22px rgba(124,58,237,.42);transition:.15s}
-.buy-btn:active{transform:scale(.98)}
-.cart-add-btn{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:15px;font-size:22px;cursor:pointer;transition:.15s}
-.cart-add-btn:active{transform:scale(.95)}
-.cart-add-btn.added{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4)}
-
-/* ─── CART ─── */
-.cart-page{padding:14px}
-.cart-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:14px}
-.cart-empty{text-align:center;padding:60px 20px}
-.cart-empty-ico{font-size:60px;opacity:.25;margin-bottom:14px}
-.cart-empty p{color:var(--text2);font-size:14px}
-.ci{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:8px}
-.ci-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.ci-emoji{font-size:26px}
-.ci-info{flex:1}
-.ci-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.ci-price{font-size:13px;color:var(--accent2);font-weight:600}
-.ci-del{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:7px 10px;color:var(--red);font-size:14px;cursor:pointer}
-.ci-del:active{transform:scale(.9)}
-.ci-btns{display:flex;gap:8px}
-.ci-buy{flex:1;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:10px;padding:9px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:.15s}
-.ci-buy:active{transform:scale(.97)}
-/* promo in cart */
-.cart-promo{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
-.cart-promo-title{font-size:13px;font-weight:600;margin-bottom:10px}
-.cart-tot{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin:10px 0}
-.ct-rows{display:flex;flex-direction:column;gap:6px}
-.ct-row{display:flex;justify-content:space-between;align-items:center;font-size:13px}
-.ct-lbl{color:var(--text2)}
-.ct-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700}
-.ct-total-row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px;margin-top:6px}
-.ct-total-lbl{font-size:14px;color:var(--text2)}
-.ct-total-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--accent2)}
-.ct-disc{font-size:12px;color:var(--green);text-align:right}
-.pay-info{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--green);margin-bottom:12px;line-height:1.6}
-.checkout-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:var(--r);padding:16px;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;color:#fff;cursor:pointer;box-shadow:0 4px 22px rgba(124,58,237,.42);transition:.15s}
-.checkout-btn:active{transform:scale(.98)}
-
-/* ─── PROFILE ─── */
-.prof-page{padding:14px}
-.prof-card{background:linear-gradient(135deg,#1a0a38,#0a1030,#0a1820);border:1px solid #2a1a5a;border-radius:20px;padding:24px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
-.prof-card::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(124,58,237,.28),transparent 70%);pointer-events:none}
-.prof-ava{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:27px;margin:0 auto 10px;box-shadow:0 4px 18px var(--glow)}
-.prof-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
-.prof-status{display:inline-block;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px}
-.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.sbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
-.sb-v{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent2)}
-.sb-l{font-size:10px;color:var(--text2);margin-top:3px}
-.ref-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.ref-ttl{font-size:14px;font-weight:600;margin-bottom:6px}
-.ref-desc{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6}
-.ref-link-row{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.ref-link-txt{flex:1;font-size:12px;color:var(--text2);word-break:break-all}
-.ref-copy{background:var(--accent);border:none;border-radius:8px;padding:7px 12px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:.15s}
-.ref-copy:active{transform:scale(.93)}
-
-/* ─── BOTTOM NAV ─── */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(9,9,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:200;padding:8px 0 18px}
-.bi{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s}
-.bi:active{transform:scale(.88)}
-.bi-icon{font-size:21px}.bi-lbl{font-size:10px;color:var(--text3);font-weight:500}
-.bi.on .bi-lbl{color:var(--accent2)}.bi.on .bi-icon{filter:drop-shadow(0 0 7px var(--accent2))}
-
-/* ─── TOAST ─── */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--green);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:999;white-space:nowrap;pointer-events:none}
-.toast.v{opacity:1;transform:translateX(-50%) translateY(0)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.au{animation:fadeUp .28s ease}
-.sec-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:10px}
-.mt14{margin-top:14px}.ph14{padding:0 14px}
-.empty-s{text-align:center;padding:36px 20px;color:var(--text2);font-size:14px}
-</style>
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+body {
+  font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(255,215,0,0.15), transparent 40%);
+  pointer-events: none; z-index: 0;
+}
+.app {
+  position: relative; z-index: 1; max-width: 500px; margin: 0 auto; min-height: 100vh;
+  padding: 1rem; padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+.header { text-align: center; padding: 1.5rem 0; margin-bottom: 1rem; animation: slideUp 0.6s; }
+.logo {
+  font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ffb800); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; animation: pulse 3s infinite;
+}
+.score-card {
+  background: rgba(19,19,29,0.7); backdrop-filter: blur(20px); border: 2px solid var(--border);
+  border-radius: 20px; padding: 2rem; margin-bottom: 2rem; text-align: center;
+  animation: slideUp 0.6s 0.2s both;
+}
+.score-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+.score-display {
+  font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ffb800); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; margin: 0.5rem 0;
+}
+.per-click { font-size: 0.9rem; color: var(--muted); margin-top: 1rem; }
+.per-click span { color: var(--success); font-weight: 700; font-family: 'Orbitron', sans-serif; }
+.click-zone { display: flex; justify-content: center; margin: 2rem 0; padding: 1rem; animation: slideUp 0.6s 0.3s both; }
+.click-target {
+  width: 200px; height: 200px; border-radius: 50%;
+  background: linear-gradient(145deg, #1a1a28, #13131d); border: 3px solid var(--accent);
+  display: flex; align-items: center; justify-content: center; font-size: 5rem; cursor: pointer;
+  transition: transform 0.2s; user-select: none; animation: float 3s infinite;
+}
+.click-target:active { transform: scale(0.95); }
+.upgrades-title {
+  font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: var(--accent);
+  margin: 2rem 0 1rem 0; text-transform: uppercase; animation: slideUp 0.6s 0.4s both;
+}
+.upgrades { display: grid; gap: 0.75rem; animation: slideUp 0.6s 0.5s both; }
+.upgrade {
+  display: flex; justify-content: space-between; align-items: center; padding: 1.25rem;
+  background: rgba(19,19,29,0.7); border: 1px solid var(--border); border-radius: 16px; transition: all 0.3s;
+}
+.upgrade:hover:not(.locked) {
+  background: rgba(26,26,40,0.85); border-color: rgba(255,215,0,0.5); transform: translateX(4px);
+}
+.upgrade.locked { opacity: 0.4; cursor: not-allowed; }
+.upgrade.unlocked { cursor: pointer; }
+.upgrade-info h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+.upgrade-info p { font-size: 0.8rem; color: var(--muted); }
+.upgrade-cost { font-family: 'Orbitron', sans-serif; font-weight: 700; color: var(--accent); font-size: 1.1rem; }
+.panel { display: none; }
+.panel.active { display: block; }
+.nav-tabs {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; display: flex;
+  background: rgba(19,19,29,0.95); backdrop-filter: blur(20px);
+  padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--border); box-shadow: 0 -8px 30px rgba(0,0,0,0.7);
+}
+.nav-tab {
+  flex: 1; padding: 0.75rem 0.25rem; background: transparent; border: none; color: var(--muted);
+  cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; align-items: center;
+  gap: 0.35rem; font-family: 'Orbitron', sans-serif; text-transform: uppercase;
+  font-size: 0.65rem; font-weight: 700;
+}
+.nav-icon { font-size: 1.6rem; }
+.nav-tab:hover { color: var(--text); background: rgba(255,215,0,0.1); }
+.nav-tab.active { color: var(--accent); background: rgba(255,215,0,0.15); }
+.nav-tab.active .nav-icon { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+.stats-grid { display: grid; gap: 1rem; margin-top: 1rem; }
+.stat-card {
+  background: rgba(19,19,29,0.7); border: 1px solid var(--border); border-radius: 16px;
+  padding: 1.5rem; display: flex; align-items: center; gap: 1.2rem; transition: all 0.3s;
+}
+.stat-card:hover { transform: translateY(-4px); border-color: rgba(255,215,0,0.3); }
+.stat-icon { font-size: 2rem; }
+.stat-info h3 {
+  font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase;
+}
+.stat-info p {
+  font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700;
+  background: linear-gradient(135deg, #ffd700, #ffb800); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ranking-header {
+  text-align: center; margin-bottom: 2rem; padding: 2rem; background: rgba(19,19,29,0.7);
+  border: 2px solid var(--border); border-radius: 20px;
+}
+.ranking-header h2 {
+  font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #ffd700, #ffb800); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ranking-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.rank-item {
+  display: flex; align-items: center; gap: 1rem; padding: 1.25rem;
+  background: rgba(19,19,29,0.7); border: 1px solid var(--border);
+  border-radius: 16px; transition: all 0.3s;
+}
+.rank-item:hover { transform: translateX(6px); border-color: rgba(255,215,0,0.4); }
+.rank-item.player { border: 2px solid var(--accent); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+.rank-position {
+  font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ffb800); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; min-width: 50px; text-align: center;
+}
+.rank-info { flex: 1; }
+.rank-name { font-weight: 600; margin-bottom: 0.2rem; }
+.rank-power { font-size: 0.8rem; color: var(--muted); }
+.rank-score {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; color: var(--accent); font-size: 1.2rem;
+}
+.ranking-loading { text-align: center; padding: 2rem; color: var(--muted); }
+  </style>
 </head>
 <body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">💰 COSMIC CLICKER</div>
+    </header>
 
-<div class="hdr" id="hdr">
-  <div class="hdr-top">
-    <div class="logo">GAME<em>•</em>STORE</div>
-    <div class="hdr-right">
-      <div class="ico-btn" onclick="goPage('cart')">🛒<div class="cbadge" id="cbadge">0</div></div>
+    <div class="panel active" id="panel-game">
+      <div class="score-card">
+        <div class="score-label">Твой баланс</div>
+        <div class="score-display" id="score">0</div>
+        <div class="per-click">За тап: <span id="perClick">1</span> 🪙</div>
+      </div>
+      <div class="click-zone">
+        <div class="click-target" id="clickTarget">🪙</div>
+      </div>
+      <h3 class="upgrades-title">⚡ Магазин улучшений</h3>
+      <div class="upgrades" id="upgrades"></div>
+      <h3 class="upgrades-title">⛏️ Крипто майнинг (оффлайн)</h3>
+      <div class="score-card" style="margin-top:1rem;">
+        <div class="score-label">Майнинг в час</div>
+        <div class="score-display" style="font-size:1.5rem;" id="passiveIncome">0</div>
+        <div class="per-click">⏱️ Работает до 3 часов оффлайн</div>
+      </div>
+      <div class="upgrades" id="passiveUpgrades"></div>
     </div>
-  </div>
-  <div class="htabs" id="htabs" style="display:none">
-    <div class="htab on" data-t="all" onclick="switchCat('all',this)">🔥 Все</div>
-    <div class="htab" data-t="games" onclick="switchCat('games',this)">🎮 Игры</div>
-    <div class="htab" data-t="ai" onclick="switchCat('ai',this)">🤖 AI</div>
-    <div class="htab" data-t="stream" onclick="switchCat('stream',this)">🎵 Музыка</div>
-  </div>
-</div>
 
-<!-- HOME -->
-<div class="page on" id="page-home">
-  <div class="hero au">
-    <div class="hero-tag">🔥 СКИДКИ ДО 35%</div>
-    <h2>Игровая валюта<br>и подписки</h2>
-    <p>Оплата СБП и картой РФ · Мгновенная выдача · Поддержка 24/7</p>
-    <div class="hero-chips">
-      <div class="chip">💳 СБП</div><div class="chip">🏦 Карта РФ</div>
-      <div class="chip">⚡ Автовыдача</div><div class="chip">🔒 Безопасно</div>
+    <div class="panel" id="panel-friends">
+      <div class="score-card">
+        <div class="score-label">🎁 Награда за друга</div>
+        <div class="score-display" style="font-size:1.8rem;">+5,000 🪙</div>
+        <div class="per-click">+ 10% от заработка</div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="stat-card">
+          <div><div class="stat-icon">👥</div></div>
+          <div class="stat-info"><h3>Приглашено</h3><p id="friendsCount">0</p></div>
+        </div>
+        <div class="stat-card">
+          <div><div class="stat-icon">💰</div></div>
+          <div class="stat-info"><h3>Заработано</h3><p id="friendsReward">0</p></div>
+        </div>
+      </div>
+      <button id="inviteBtn" style="width:100%;padding:1.25rem;background:linear-gradient(135deg,#ffd700,#ffb800);border:none;border-radius:16px;font-family:Orbitron;font-size:1rem;font-weight:900;color:#000;margin:1.5rem 0;cursor:pointer;">
+        📤 Пригласить друга
+      </button>
+      <div style="padding:1rem;background:rgba(19,19,29,0.7);border-radius:16px;margin-bottom:1rem;">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">Твоя ссылка:</div>
+        <div style="display:flex;gap:0.5rem;">
+          <input id="refLink" readonly style="flex:1;padding:0.75rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:0.8rem;font-family:monospace;" value="Загрузка...">
+          <button id="copyBtn" style="padding:0.75rem 1rem;background:rgba(255,215,0,0.2);border:1px solid var(--accent);border-radius:12px;cursor:pointer;font-size:1.2rem;">📋</button>
+        </div>
+      </div>
+      <h3 class="upgrades-title">Твои друзья</h3>
+      <div id="friendsList" class="ranking-list"></div>
     </div>
+
+    <div class="panel" id="panel-shop">
+      <div class="score-card">
+        <div class="score-label">🎁 Промокоды для @gamestoren_bot</div>
+        <div class="score-display" style="font-size:1.5rem;">Скидки</div>
+        <div class="per-click">Купи промокод и получи скидку!</div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🎟️</div>
+          <div class="stat-info">
+            <h3>Куплено промокодов</h3>
+            <p id="promoCount">0</p>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="upgrades-title">💳 Доступные промокоды</h3>
+      <div id="promocodesList"></div>
+      
+      <h3 class="upgrades-title" style="margin-top:2rem;">🎫 Мои промокоды</h3>
+      <div id="myPromocodes" class="ranking-list"></div>
+    </div>
+
+    <div class="panel" id="panel-stats">
+      <h3 class="upgrades-title">📊 Статистика</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">👆</div>
+          <div class="stat-info"><h3>Кликов</h3><p id="statClicks">0</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info"><h3>Заработано</h3><p id="statEarned">0</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🛍️</div>
+          <div class="stat-info"><h3>Покупок</h3><p id="statPurchases">0</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-info"><h3>Время</h3><p id="statTime">0с</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-ranking">
+      <div class="ranking-header">
+        <h2>🏆 ТОП ИГРОКОВ</h2>
+        <p id="rankingSubtitle">Реальные игроки</p>
+      </div>
+      <div class="ranking-list" id="rankingList">
+        <div class="ranking-loading">⏳ Загрузка...</div>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="game">
+        <div class="nav-icon">🎮</div><div>Игра</div>
+      </button>
+      <button class="nav-tab" data-tab="shop">
+        <div class="nav-icon">🎁</div><div>Скидки</div>
+      </button>
+      <button class="nav-tab" data-tab="friends">
+        <div class="nav-icon">👥</div><div>Друзья</div>
+      </button>
+      <button class="nav-tab" data-tab="stats">
+        <div class="nav-icon">📊</div><div>Статы</div>
+      </button>
+      <button class="nav-tab" data-tab="ranking">
+        <div class="nav-icon">🏆</div><div>Топ</div>
+      </button>
+    </nav>
   </div>
-  <div class="home-stats au">
-    <div class="hstat"><div class="hstat-val">500+</div><div class="hstat-lbl">Заказов</div></div>
-    <div class="hstat"><div class="hstat-val">4.9★</div><div class="hstat-lbl">Рейтинг</div></div>
-    <div class="hstat"><div class="hstat-val">24/7</div><div class="hstat-lbl">Поддержка</div></div>
-  </div>
-  <div class="ph14 mt14 au"><div class="sec-title">🔥 Популярные товары</div></div>
-  <div class="feat-scroll au" id="featScroll"></div>
-  <div class="hiw au" style="margin-top:14px">
-    <div class="hiw-title">⚡ Как это работает?</div>
-    <div class="hiw-step"><div class="step-num">1</div><div class="step-txt"><b>Выбери товар</b> в каталоге и нажми «Купить» или «В корзину»</div></div>
-    <div class="hiw-step"><div class="step-num">2</div><div class="step-txt"><b>Оплати</b> через СБП или карту РФ</div></div>
-    <div class="hiw-step"><div class="step-num">3</div><div class="step-txt"><b>Получи код</b> мгновенно после оплаты</div></div>
-  </div>
-</div>
 
-<!-- CATALOG -->
-<div class="page" id="page-catalog">
-  <div class="cat-page au">
-    <div class="cat-page-title">📦 Каталог</div>
-    <div id="catContent"></div>
-  </div>
-</div>
+  <script>
+const TgWebApp=window.Telegram?.WebApp;
+const isTelegram=!!TgWebApp?.initDataUnsafe?.user;
+const tgUser=isTelegram?TgWebApp.initDataUnsafe.user:null;
+if(TgWebApp)TgWebApp.ready();
 
-<!-- ITEMS -->
-<div class="page" id="page-items">
-  <div class="items-page au">
-    <div class="back-btn" onclick="goBack()">← Назад</div>
-    <div id="itemsHdr"></div>
-    <div class="prod-list" id="itemsList"></div>
-  </div>
-</div>
+let db=null;
+if(typeof firebase!=='undefined'&&typeof FIREBASE_ENABLED!=='undefined'&&FIREBASE_ENABLED&&typeof FIREBASE_CONFIG!=='undefined'){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+    console.log('✅ Firebase подключен');
+  }catch(e){
+    console.warn('⚠️ Firebase error:',e);
+  }
+}
 
-<!-- DETAIL -->
-<div class="page" id="page-detail">
-  <div id="detailContent"></div>
-</div>
-
-<!-- CART -->
-<div class="page" id="page-cart">
-  <div class="cart-page">
-    <div class="cart-title">🛒 Корзина</div>
-    <div id="cartContent"></div>
-  </div>
-</div>
-
-<!-- PROFILE -->
-<div class="page" id="page-profile">
-  <div class="prof-page" id="profContent"></div>
-</div>
-
-<div class="bnav">
-  <div class="bi on" id="bi-home" onclick="goPage('home')"><div class="bi-icon">🏠</div><div class="bi-lbl">Главная</div></div>
-  <div class="bi" id="bi-catalog" onclick="goPage('catalog')"><div class="bi-icon">📦</div><div class="bi-lbl">Каталог</div></div>
-  <div class="bi" id="bi-cart" onclick="goPage('cart')"><div class="bi-icon">🛒</div><div class="bi-lbl">Корзина</div></div>
-  <div class="bi" id="bi-profile" onclick="goPage('profile')"><div class="bi-icon">👤</div><div class="bi-lbl">Профиль</div></div>
-</div>
-<div class="toast" id="toast"></div>
-
-<script>
-const tg = window.Telegram?.WebApp;
-if(tg){ tg.expand(); tg.setHeaderColor('#09090f'); tg.setBackgroundColor('#09090f'); }
-const TG_USER = tg?.initDataUnsafe?.user || {first_name:'Гость',id:0};
-
-/* ══════════════════════
-   ДАННЫЕ
-   Цены: 1 V-Bucks = 1.5 руб (с маржей)
-   1000 vbucks = 1500₽ по курсу, но с маржой — 1500₽ при цене 749₽
-   Используем твои цены которые уже дают хорошую маржу
-══════════════════════ */
-const DATA = {
-  games:[
-    { key:'fortnite', name:'Fortnite', currency:'V-Bucks', emoji:'⚡', badge:'ХИТ', btype:'bh',
-      desc:'Официальная валюта Fortnite. Трать на скины, эмоции, боевой пропуск.',
-      items:[
-        {id:101, name:'1 000 V-Bucks',  price:1500, old:1999, info:'≈ 1 скин или эмоция'},
-        {id:102, name:'2 800 V-Bucks',  price:4200, old:5599, info:'Боевой пропуск + скин · +300 бонусных'},
-        {id:103, name:'5 000 V-Bucks',  price:7500, old:9999, info:'Большой выбор косметики · +500 бонусных'},
-        {id:104, name:'13 500 V-Bucks', price:20250,old:26999,info:'Максимальный пак · +500 бонусных'},
-      ]
-    },
-    { key:'brawl', name:'Brawl Stars', currency:'Gems', emoji:'💎', badge:'', btype:'',
-      desc:'Кристаллы Brawl Stars. Трать на скины, Brawl Pass и боксы.',
-      items:[
-        {id:201, name:'80 Gems',  price:490,  old:649,  info:''},
-        {id:202, name:'170 Gems', price:990,  old:1299, info:''},
-        {id:203, name:'360 Gems', price:1990, old:2599, info:''},
-        {id:204, name:'950 Gems', price:4990, old:6499, info:'Самый выгодный пак'},
-      ]
-    },
+const state={
+  score:BigInt(0),totalClicks:0,totalEarned:BigInt(0),totalSpent:BigInt(0),
+  purchasesCount:0,startTime:Date.now(),lastOnline:Date.now(),
+  referrals:[],referralRewards:0,
+  purchasedPromocodes:[],
+  upgrades:[
+    {id:'bot',name:'🤖 Трейдинг бот',desc:'+1 за тап',cost:10,value:1,count:0},
+    {id:'exchange',name:'💱 Криптобиржа',desc:'+5 за тап',cost:100,value:5,count:0},
+    {id:'blockchain',name:'⛓️ Блокчейн узел',desc:'+25 за тап',cost:500,value:25,count:0},
+    {id:'nft',name:'🎨 NFT маркетплейс',desc:'+100 за тап',cost:2500,value:100,count:0},
+    {id:'defi',name:'🏦 DeFi протокол',desc:'+500 за тап',cost:10000,value:500,count:0},
+    {id:'metaverse',name:'🌐 Метавселенная',desc:'+2500 за тап',cost:50000,value:2500,count:0},
   ],
-  ai:[
-    { key:'chatgpt', name:'ChatGPT Plus', currency:'Подписка', emoji:'🤖', badge:'ХИТ', btype:'bh',
-      desc:'GPT-4o, DALL-E 3, анализ файлов, без суточных лимитов.',
-      items:[{id:1001,name:'ChatGPT Plus — 1 месяц',price:1699,old:2099,info:'GPT-4o · DALL-E 3 · без лимитов'}]
-    },
-    { key:'claude', name:'Claude Pro', currency:'Подписка', emoji:'🧠', badge:'', btype:'',
-      desc:'Claude 3.5 Sonnet без лимитов, приоритетный доступ в любое время.',
-      items:[{id:1101,name:'Claude Pro — 1 месяц',price:1599,old:1999,info:'Claude 3.5 · без лимитов'}]
-    },
-    { key:'midj', name:'Midjourney', currency:'Подписка', emoji:'🎨', badge:'', btype:'',
-      desc:'Генерация изображений AI. Лучший инструмент для арта и иллюстраций.',
-      items:[
-        {id:1201,name:'Midjourney Basic — 1 мес',price:999,old:1299,info:'200 генераций · коммерческое использование'},
-        {id:1202,name:'Midjourney Standard — 1 мес',price:1799,old:2299,info:'Без лимита · Relax режим'},
-      ]
-    },
-    { key:'grok', name:'Grok Premium', currency:'Подписка', emoji:'✦', badge:'NEW', btype:'bn',
-      desc:'AI от xAI. Grok-2, генерация изображений Aurora, режим DeepSearch.',
-      items:[{id:1301,name:'Grok Premium — 1 месяц',price:1499,old:1899,info:'Grok-2 · Aurora · DeepSearch'}]
-    },
-    { key:'perp', name:'Perplexity Pro', currency:'Подписка', emoji:'🔍', badge:'', btype:'',
-      desc:'AI-поисковик с доступом к интернету в реальном времени.',
-      items:[{id:1401,name:'Perplexity Pro — 1 месяц',price:1299,old:1699,info:'Интернет в реальном времени · GPT-4o'}]
-    },
-    { key:'copilot', name:'GitHub Copilot', currency:'Подписка', emoji:'🐙', badge:'', btype:'',
-      desc:'AI-ассистент для программистов в VS Code, JetBrains и других редакторах.',
-      items:[{id:1501,name:'GitHub Copilot — 1 месяц',price:899,old:1199,info:'VS Code · JetBrains · Neovim'}]
-    },
-    { key:'cursor', name:'Cursor Pro', currency:'Подписка', emoji:'🖱️', badge:'NEW', btype:'bn',
-      desc:'Редактор кода с встроенным AI. Пишет целые файлы, рефакторит, объясняет.',
-      items:[{id:1601,name:'Cursor Pro — 1 месяц',price:1499,old:1999,info:'GPT-4o · Claude · без лимитов'}]
-    },
-    { key:'canva', name:'Canva Pro', currency:'Подписка', emoji:'✏️', badge:'', btype:'',
-      desc:'Дизайн-редактор: все шаблоны, удаление фона, Brand Kit, AI-инструменты.',
-      items:[
-        {id:1701,name:'Canva Pro — 1 месяц',price:599,old:849,info:'Все шаблоны · AI · удаление фона'},
-        {id:1702,name:'Canva Pro — 3 месяца',price:1499,old:2199,info:'Экономия 32%'},
-      ]
-    },
-    { key:'adobe', name:'Adobe Creative Cloud', currency:'Подписка', emoji:'🅰️', badge:'', btype:'',
-      desc:'Photoshop, Illustrator, Premiere Pro, After Effects и ещё 20+ приложений.',
-      items:[{id:1801,name:'Adobe CC — 1 месяц',price:2499,old:3299,info:'20+ приложений · все устройства'}]
-    },
+  passiveUpgrades:[
+    {id:'btc',name:'₿ Bitcoin майнер',desc:'+10/час',cost:500,value:10,count:0},
+    {id:'eth',name:'Ξ Ethereum ферма',desc:'+50/час',cost:2500,value:50,count:0},
+    {id:'asic',name:'⚙️ ASIC ферма',desc:'+250/час',cost:10000,value:250,count:0},
+    {id:'pool',name:'🏊 Майнинг пул',desc:'+1000/час',cost:50000,value:1000,count:0},
+    {id:'datacenter',name:'🏢 Дата-центр',desc:'+5000/час',cost:250000,value:5000,count:0},
   ],
-  stream:[
-    { key:'spotify', name:'Spotify Premium', currency:'Подписка', emoji:'🎵', badge:'', btype:'',
-      desc:'Музыка без рекламы, прослушивание оффлайн, высокое качество звука.',
-      items:[
-        {id:2001,name:'Spotify Premium — 1 мес',price:299,old:399,info:'Без рекламы · оффлайн · высокое качество'},
-        {id:2002,name:'Spotify Premium — 3 мес',price:749,old:1049,info:'Экономия 30%'},
-      ]
-    },
-    { key:'yt', name:'YouTube Premium', currency:'Подписка', emoji:'▶️', badge:'ХИТ', btype:'bh',
-      desc:'YouTube без рекламы, фоновое воспроизведение и YouTube Music в подарок.',
-      items:[
-        {id:2101,name:'YouTube Premium — 1 мес',price:349,old:499,info:'Без рекламы · фоновый режим · YT Music'},
-        {id:2102,name:'YouTube Premium — 3 мес',price:899,old:1349,info:'Экономия 34%'},
-      ]
-    },
-    { key:'applemus', name:'Apple Music', currency:'Подписка', emoji:'🍎', badge:'', btype:'',
-      desc:'100 млн треков, Dolby Atmos, оффлайн на всех устройствах.',
-      items:[
-        {id:2201,name:'Apple Music — 1 мес',price:299,old:399,info:'100М треков · Dolby Atmos · оффлайн'},
-        {id:2202,name:'Apple Music — 3 мес',price:749,old:1049,info:'Экономия 28%'},
-      ]
-    },
-    { key:'tidal', name:'Tidal HiFi', currency:'Подписка', emoji:'🌊', badge:'NEW', btype:'bn',
-      desc:'Музыка без потерь (Lossless) и Dolby Atmos. Для настоящих меломанов.',
-      items:[
-        {id:2301,name:'Tidal HiFi — 1 мес',price:449,old:599,info:'Lossless · Dolby Atmos · 100М треков'},
-        {id:2302,name:'Tidal HiFi — 3 мес',price:1099,old:1599,info:'Экономия 27%'},
-      ]
-    },
+  promocodes:[
+    {id:'promo10',name:'🎁 Скидка 10%',desc:'Промокод на 10% в @gamestoren_bot',cost:150000000,discount:10,purchased:false},
+    {id:'promo20',name:'🎁 Скидка 20%',desc:'Промокод на 20% в @gamestoren_bot',cost:300000000,discount:20,purchased:false},
   ]
 };
 
-/* flat maps */
-const ITEM_MAP={}, GAME_MAP={};
-Object.values(DATA).flat().forEach(g=>{
-  GAME_MAP[g.key]=g;
-  g.items.forEach(it=>{ it._g=g; ITEM_MAP[it.id]=it; });
-});
-const ALL_ITEMS=Object.values(ITEM_MAP);
-
-/* ══════════════════════
-   ПРОМОКОДЫ
-   Хранятся локально — реальные промокоды
-   приходят из бота через sendData/initData
-══════════════════════ */
-// Промокоды приходят из кликера и хранятся здесь.
-// Формат: { code: 'CLICK-ABC123', type: 'percent'|'fixed', value: 10 }
-// В реальности проверка идёт через бот при оплате.
-let appliedPromo = null;
-
-function calcDiscount(subtotal) {
-  if (!appliedPromo) return 0;
-  if (appliedPromo.type === 'percent') return Math.round(subtotal * appliedPromo.value / 100);
-  if (appliedPromo.type === 'fixed') return Math.min(appliedPromo.value, subtotal);
-  return 0;
+function formatNumber(n){
+  const num=typeof n==='bigint'?Number(n):n;
+  if(num>=1e9)return(num/1e9).toFixed(1)+'B';
+  if(num>=1e6)return(num/1e6).toFixed(1)+'M';
+  if(num>=1e3)return(num/1e3).toFixed(1)+'K';
+  return Math.floor(num).toString();
 }
 
-async function applyPromo(code, resultEl, priceEl) {
-  code = code.trim().toUpperCase();
-  if (!code) return;
+function formatTime(ms){
+  const s=Math.floor(ms/1000);
+  const m=Math.floor(s/60);
+  const h=Math.floor(m/60);
+  if(h>0)return h+'ч '+(m%60)+'м';
+  if(m>0)return m+'м';
+  return s+'с';
+}
 
-  // Отправляем боту на проверку
-  if (tg) {
-    tg.sendData(JSON.stringify({ action: 'check_promo', code }));
+function getUserId(){
+  if(tgUser)return String(tgUser.id);
+  let id=localStorage.getItem('local_id');
+  if(!id){
+    id='local_'+Date.now();
+    localStorage.setItem('local_id',id);
   }
+  return id;
+}
 
-  // Симуляция для demo — в реальности ответ придёт через бота
-  // Проверяем формат CLICK-XXXXX (из кликера)
-  if (code.startsWith('COSMIC-') && code.length >= 10) {
-    appliedPromo = { code, type: 'percent', value: 10 };
-    resultEl.textContent = '✅ Промокод применён — скидка 10%!';
-    resultEl.className = 'promo-result promo-ok';
-    resultEl.style.display = 'block';
-    if (priceEl) updateFinalPrice(priceEl, currentDetailId);
-    updateCartTotal();
-    showToast('🎉 Промокод активирован!');
-  } else if (code === 'COSMIC10') {
-    appliedPromo = { code, type: 'percent', value: 10 };
-    resultEl.textContent = '✅ Промокод применён — скидка 10%!';
-    resultEl.className = 'promo-result promo-ok';
-    resultEl.style.display = 'block';
-    if (priceEl) updateFinalPrice(priceEl, currentDetailId);
-    updateCartTotal();
-    showToast('🎉 Промокод активирован!');
-  } else {
-    appliedPromo = null;
-    resultEl.textContent = '❌ Неверный или истёкший промокод';
-    resultEl.className = 'promo-result promo-err';
-    resultEl.style.display = 'block';
+function getDisplayName(){
+  if(tgUser)return tgUser.first_name+(tgUser.last_name?' '+tgUser.last_name:'');
+  return 'Гость';
+}
+
+function getPerClick(){
+  return 1+state.upgrades.reduce((sum,u)=>sum+u.value*u.count,0);
+}
+
+function getPassiveIncome(){
+  return state.passiveUpgrades.reduce((sum,u)=>sum+u.value*u.count,0);
+}
+
+function calculateOfflineEarnings(){
+  const now=Date.now();
+  const hours=Math.min((now-state.lastOnline)/(1000*60*60),3);
+  const earned=Math.floor(getPassiveIncome()*hours);
+  state.lastOnline=now;
+  return BigInt(earned);
+}
+
+function getReferralLink(){
+  return `https://t.me/cosmicclicker_bot?start=ref_${getUserId()}`;
+}
+
+function checkReferral(){
+  const startParam=TgWebApp?.initDataUnsafe?.start_param;
+  console.log('🔍 Start param:',startParam);
+  if(startParam&&startParam.startsWith('ref_')){
+    const refId=startParam.replace('ref_','');
+    console.log('✅ Реферер:',refId);
+    return refId;
   }
+  return null;
 }
 
-function updateFinalPrice(el, itemId) {
-  const it = ITEM_MAP[itemId]; if (!it || !el) return;
-  const disc = calcDiscount(it.price);
-  const final = it.price - disc;
-  el.textContent = fmt(final) + '₽';
-}
-
-/* ══════════════════════
-   КОРЗИНА
-══════════════════════ */
-let cart = [];
-function cartTotal(){ return cart.reduce((s,i)=>s+i.price,0); }
-function updBadge(){
-  const el=document.getElementById('cbadge');
-  cart.length?(el.textContent=cart.length,el.classList.add('v')):el.classList.remove('v');
-}
-function inCart(id){ return cart.some(c=>c.id===id); }
-
-function addCart(id, fromDetail=false){
-  const it=ITEM_MAP[id]; if(!it) return;
-  if(inCart(id)){ showToast('Уже в корзине!','#f59e0b'); return; }
-  cart.push({id,name:it.name,price:it.price,emoji:it._g.emoji,game:it._g.name});
-  updBadge();
-  showToast('🛒 Добавлено в корзину!');
-  // update button state
-  const btn = document.getElementById('cartbtn-'+id);
-  if(btn){ btn.textContent='✅'; btn.classList.add('added'); }
-  if(fromDetail){
-    const dBtn = document.getElementById('det-cartbtn');
-    if(dBtn){ dBtn.textContent='✅'; dBtn.classList.add('added'); }
-  }
-}
-function rmCart(i){ cart.splice(i,1); updBadge(); renderCart(); }
-
-/* ══════════════════════
-   TOAST
-══════════════════════ */
-let tt;
-function showToast(m,c='#10b981'){
-  const el=document.getElementById('toast');
-  el.textContent=m;el.style.background=c;el.classList.add('v');
-  clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('v'),2200);
-}
-
-/* ── HELPERS ── */
-function fmt(n){ return n.toLocaleString('ru'); }
-function disc(p,o){ return Math.round((1-p/o)*100); }
-
-/* ══════════════════════
-   КАТАЛОГ
-══════════════════════ */
-let activeCat='all';
-function switchCat(cat,el){
-  activeCat=cat;
-  document.querySelectorAll('.htab').forEach(t=>t.classList.remove('on'));
-  if(el) el.classList.add('on');
-  renderCatalog();
-}
-
-function gcHtml(g){
-  return `<div class="gcard" onclick="openItems('${g.key}')">
-    ${g.badge?`<div class="gc-badge ${g.btype}">${g.badge}</div>`:''}
-    <span class="gc-emoji">${g.emoji}</span>
-    <div class="gc-name">${g.name}</div>
-    <div class="gc-sub">${g.currency}</div>
-  </div>`;
-}
-
-function renderCatalog(){
-  const el=document.getElementById('catContent');
-  const cats=activeCat==='all'
-    ?[{label:'🎮 Игровая валюта',list:DATA.games},{label:'🤖 AI подписки',list:DATA.ai},{label:'🎵 Музыка',list:DATA.stream}]
-    :activeCat==='games'?[{label:'🎮 Игровая валюта',list:DATA.games}]
-    :activeCat==='ai'?[{label:'🤖 AI подписки',list:DATA.ai}]
-    :[{label:'🎵 Музыка',list:DATA.stream}];
-  el.innerHTML=cats.map(c=>`
-    <div class="cat-block">
-      <div class="cat-bhead">
-        <div class="cat-btitle">${c.label}</div>
-        <div class="cat-bcnt">${c.list.length} категории</div>
-      </div>
-      <div class="grid2">${c.list.map(gcHtml).join('')}</div>
-    </div>`).join('');
-}
-
-/* ══════════════════════
-   СПИСОК ТОВАРОВ
-══════════════════════ */
-let prevPage='catalog';
-function openItems(key){
-  const g=GAME_MAP[key]; if(!g) return;
-  prevPage=currentPage;
-  document.getElementById('itemsHdr').innerHTML=`
-    <div class="items-hdr">
-      <span class="ih-emoji">${g.emoji}</span>
-      <div class="ih-name">${g.name}</div>
-      <div class="ih-desc">${g.desc}</div>
-    </div>`;
-  document.getElementById('itemsList').innerHTML=g.items.map(it=>{
-    const d=disc(it.price,it.old);
-    const inC=inCart(it.id);
-    return `<div class="prow">
-      <div class="prow-top">
-        <div class="pr-left">
-          <div class="pr-name">${it.name}</div>
-          ${it.info?`<div class="pr-info">${it.info}</div>`:''}
-        </div>
-        <div class="pr-right">
-          <div class="pr-price">${fmt(it.price)}₽</div>
-          <div class="pr-old">${fmt(it.old)}₽</div>
-          <div class="pr-disc">−${d}%</div>
-        </div>
-      </div>
-      <div class="prow-btns">
-        <button class="btn-buy" onclick="openDetail(${it.id})">Купить</button>
-        <button class="btn-cart ${inC?'added':''}" id="cartbtn-${it.id}" onclick="addCart(${it.id})">
-          ${inC?'✅':'🛒'}
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-  goPage('items');
-}
-
-function goBack(){ goPage(prevPage); }
-
-/* ══════════════════════
-   ДЕТАЛЬНАЯ СТРАНИЦА
-══════════════════════ */
-let currentDetailId=null, selPay='sbp';
-
-function openDetail(id){
-  const it=ITEM_MAP[id]; if(!it) return;
-  const g=it._g; const d=disc(it.price,it.old);
-  currentDetailId=id; appliedPromo=null;
-  const inC=inCart(id);
-
-  prevPage=currentPage;
-  document.getElementById('detailContent').innerHTML=`
-  <div class="au">
-    <div class="det-head">
-      <div class="back-btn" onclick="goBack()">← Назад</div>
-      <span class="det-emoji">${g.emoji}</span>
-      <div class="det-name">${it.name}</div>
-      <div class="det-cat">${g.name} · ${g.currency}</div>
-      <div class="price-row">
-        <div class="det-price">${fmt(it.price)}₽</div>
-        <div class="det-old">${fmt(it.old)}₽</div>
-        <div class="det-disc">−${d}%</div>
-      </div>
-    </div>
-    <div class="det-body">
-      ${it.info?`<div class="feats"><div class="frow"><span class="ico">📋</span><span>${it.info}</span></div></div>`:''}
-      <div class="feats">
-        <div class="frow"><span class="ico">⚡</span><span>Мгновенная автовыдача после оплаты</span></div>
-        <div class="frow"><span class="ico">🔒</span><span>Безопасная оплата через Paypalich</span></div>
-        <div class="frow"><span class="ico">💬</span><span>Поддержка 24/7 — ответим за 30 минут</span></div>
-        <div class="frow"><span class="ico">✅</span><span>Гарантия возврата при любых проблемах</span></div>
-      </div>
-      <div class="promo-block">
-        <div class="promo-title">🎟 Промокод</div>
-        <div class="promo-row">
-          <input class="promo-input" id="det-promo" placeholder="Введи промокод (напр. CLICK-XXXXX)" maxlength="20">
-          <button class="promo-apply" onclick="applyPromo(document.getElementById('det-promo').value, document.getElementById('det-promo-res'), document.getElementById('det-final-val'))">Применить</button>
-        </div>
-        <div class="promo-result" id="det-promo-res"></div>
-      </div>
-      <div class="pay-opts">
-        <div class="pay-title">💳 Способ оплаты</div>
-        <div class="pay-methods">
-          <div class="pay-method sel" id="pm-sbp" onclick="selPayMethod('sbp')"><div class="pay-ico">📲</div><div>СБП</div></div>
-          <div class="pay-method" id="pm-card" onclick="selPayMethod('card')"><div class="pay-ico">💳</div><div>Карта РФ</div></div>
-        </div>
-      </div>
-      <div class="final-price">
-        <div class="fp-lbl">Итого к оплате:</div>
-        <div class="fp-val" id="det-final-val">${fmt(it.price)}₽</div>
-      </div>
-      <div class="det-btns">
-        <button class="buy-btn" onclick="doBuy(${id})">ОПЛАТИТЬ</button>
-        <button class="cart-add-btn ${inC?'added':''}" id="det-cartbtn" onclick="addCart(${id},true)">${inC?'✅':'🛒'}</button>
-      </div>
-    </div>
-  </div>`;
-  goPage('detail');
-}
-
-function selPayMethod(m){
-  selPay=m;
-  document.querySelectorAll('.pay-method').forEach(el=>el.classList.remove('sel'));
-  document.getElementById('pm-'+m)?.classList.add('sel');
-}
-
-function doBuy(id){
-  const it=ITEM_MAP[id]; if(!it) return;
-  const discAmt=calcDiscount(it.price);
-  const finalPrice=it.price-discAmt;
-  if(tg){
-    tg.sendData(JSON.stringify({
-      action:'buy', item_id:id, item_name:it.name,
-      price:finalPrice, original_price:it.price,
-      promo:appliedPromo?.code||null, pay_method:selPay
-    }));
-  }
-  showToast('🔄 Создаём ссылку на оплату...');
-}
-
-/* ══════════════════════
-   КОРЗИНА РЕНДЕР
-══════════════════════ */
-function updateCartTotal(){
-  const totEl=document.getElementById('cart-total-block');
-  if(!totEl||!cart.length) return;
-  const sub=cartTotal();
-  const discAmt=calcDiscount(sub);
-  const final=sub-discAmt;
-  let discRow=discAmt>0?`<div class="ct-row"><div class="ct-lbl">Скидка по промокоду</div><div class="ct-val" style="color:var(--green)">−${fmt(discAmt)}₽</div></div>`:'';
-  totEl.innerHTML=`<div class="ct-rows">
-    <div class="ct-row"><div class="ct-lbl">Товаров: ${cart.length}</div><div class="ct-val">${fmt(sub)}₽</div></div>
-    ${discRow}
-  </div>
-  <div class="ct-total-row">
-    <div class="ct-total-lbl">Итого:</div>
-    <div class="ct-total-val">${fmt(final)}₽</div>
-  </div>`;
-}
-
-function renderCart(){
-  const el=document.getElementById('cartContent');
-  if(!cart.length){
-    el.innerHTML=`<div class="cart-empty"><div class="cart-empty-ico">🛒</div><p>Корзина пуста — добавь товары из каталога</p></div>`;
+async function processReferral(){
+  const referrerId=checkReferral();
+  console.log('🎯 Обработка реферала...');
+  console.log('   Реферер ID:',referrerId);
+  console.log('   DB доступен:',!!db);
+  console.log('   Telegram user:',tgUser?tgUser.id:'нет');
+  
+  if(!referrerId){
+    console.log('⚠️ Нет реферальной ссылки');
     return;
   }
-  const sub=cartTotal(); const discAmt=calcDiscount(sub); const final=sub-discAmt;
-  let discRow=discAmt>0?`<div class="ct-row"><div class="ct-lbl">Скидка по промокоду</div><div class="ct-val" style="color:var(--green)">−${fmt(discAmt)}₽</div></div>`:'';
-
-  el.innerHTML=cart.map((item,i)=>`
-    <div class="ci">
-      <div class="ci-top">
-        <div class="ci-emoji">${item.emoji}</div>
-        <div class="ci-info">
-          <div class="ci-name">${item.name}</div>
-          <div class="ci-price">${fmt(item.price)}₽</div>
-        </div>
-        <div class="ci-del" onclick="rmCart(${i})">✕</div>
-      </div>
-      <div class="ci-btns">
-        <button class="ci-buy" onclick="buyCartItem(${item.id})">⚡ Купить отдельно</button>
-      </div>
-    </div>`).join('')+`
-  <div class="cart-promo">
-    <div class="cart-promo-title">🎟 Промокод</div>
-    <div class="promo-row">
-      <input class="promo-input" id="cart-promo" placeholder="CLICK-XXXXX или другой код" maxlength="20" value="${appliedPromo?.code||''}">
-      <button class="promo-apply" onclick="applyPromo(document.getElementById('cart-promo').value, document.getElementById('cart-promo-res'), null)">Применить</button>
-    </div>
-    <div class="promo-result ${appliedPromo?'promo-ok':''}" id="cart-promo-res" style="${appliedPromo?'display:block':''}">
-      ${appliedPromo?`✅ Промокод ${appliedPromo.code} применён — скидка ${appliedPromo.value}${appliedPromo.type==='percent'?'%':'₽'}!`:''}
-    </div>
-  </div>
-  <div class="cart-tot" id="cart-total-block">
-    <div class="ct-rows">
-      <div class="ct-row"><div class="ct-lbl">Товаров: ${cart.length}</div><div class="ct-val">${fmt(sub)}₽</div></div>
-      ${discRow}
-    </div>
-    <div class="ct-total-row">
-      <div class="ct-total-lbl">Итого:</div>
-      <div class="ct-total-val">${fmt(final)}₽</div>
-    </div>
-  </div>
-  <div class="pay-info">📲 Оплата через Paypalich — СБП или карта РФ</div>
-  <button class="checkout-btn" onclick="checkoutCart()">ОПЛАТИТЬ ${fmt(final)}₽</button>`;
-}
-
-function buyCartItem(id){
-  // Открываем страницу товара для отдельной покупки
-  openDetail(id);
-}
-
-function checkoutCart(){
-  if(!cart.length) return;
-  const sub=cartTotal();
-  const discAmt=calcDiscount(sub);
-  const final=sub-discAmt;
-  if(tg){
-    tg.sendData(JSON.stringify({
-      action:'checkout_cart', cart, total:final,
-      original_total:sub, promo:appliedPromo?.code||null
-    }));
+  
+  if(!db){
+    console.log('⚠️ Firebase не подключен');
+    return;
   }
-  showToast('🔄 Создаём ссылку на оплату...');
+  
+  if(!tgUser){
+    console.log('⚠️ Нет Telegram пользователя');
+    return;
+  }
+  
+  const myId=getUserId();
+  console.log('   Мой ID:',myId);
+  
+  if(referrerId===myId){
+    console.log('⚠️ Нельзя пригласить самого себя');
+    return;
+  }
+  
+  try{
+    console.log('📥 Проверяю был ли уже приглашен...');
+    const myDoc=await db.collection('players').doc(myId).get();
+    if(myDoc.exists&&myDoc.data().referredBy){
+      console.log('⚠️ Уже был приглашен ранее:',myDoc.data().referredBy);
+      return;
+    }
+    
+    console.log('📥 Загружаю данные реферера...');
+    const refDoc=await db.collection('players').doc(referrerId).get();
+    if(!refDoc.exists){
+      console.log('⚠️ Реферер не найден в базе');
+      // Создаем запись для реферера если его нет
+      await db.collection('players').doc(referrerId).set({
+        referrals:[{
+          id:myId,
+          name:getDisplayName(),
+          joinedAt:Date.now()
+        }],
+        referralRewards:5000,
+        score:5000,
+        updatedAt:Date.now()
+      },{merge:true});
+      console.log('✅ Создана новая запись для реферера с наградой!');
+    }else{
+      const refData=refDoc.data();
+      console.log('📊 Данные реферера:',{
+        name:refData.name,
+        currentScore:refData.score,
+        currentReferrals:(refData.referrals||[]).length
+      });
+      
+      const newReferrals=[...(refData.referrals||[]),{
+        id:myId,
+        name:getDisplayName(),
+        joinedAt:Date.now()
+      }];
+      
+      const newScore=Number(refData.score||0)+5000;
+      const newRewards=(refData.referralRewards||0)+5000;
+      
+      console.log('💾 Обновляю реферера...');
+      console.log('   Новый счёт:',newScore);
+      console.log('   Всего рефералов:',newReferrals.length);
+      
+      await db.collection('players').doc(referrerId).update({
+        referrals:newReferrals,
+        referralRewards:newRewards,
+        score:newScore,
+        updatedAt:Date.now()
+      });
+      
+      console.log('✅ Реферер обновлен!');
+    }
+    
+    console.log('💾 Сохраняю кто меня пригласил...');
+    await db.collection('players').doc(myId).set({
+      referredBy:referrerId,
+      name:getDisplayName(),
+      username:tgUser?.username||'',
+      joinedAt:Date.now(),
+      updatedAt:Date.now()
+    },{merge:true});
+    
+    console.log('🎉 РЕФЕРАЛЬНАЯ НАГРАДА НАЧИСЛЕНА!');
+    console.log(`💰 Реферер ${referrerId} получил +5,000 монет`);
+    
+    if(TgWebApp?.showPopup){
+      TgWebApp.showPopup({
+        title:'🎉 Добро пожаловать!',
+        message:'Ты зарегистрировался по реферальной ссылке!\n\nТвой друг получил +5,000 🪙',
+        buttons:[{type:'ok'}]
+      });
+    }
+  }catch(e){
+    console.error('❌ Ошибка обработки реферала:',e);
+    console.error('   Детали:',e.message);
+  }
 }
 
-/* ══════════════════════
-   ПРОФИЛЬ
-══════════════════════ */
-function renderProfile(){
-  // Правильная реферальная ссылка с @gamestoren_bot
-  const botUsername='gamestoren_bot';
-  const ref=`https://t.me/${botUsername}?start=REF${TG_USER.id}`;
-  document.getElementById('profContent').innerHTML=`
-  <div class="prof-card au"><div class="prof-ava">👤</div>
-    <div class="prof-name">${TG_USER.first_name}</div>
-    <div class="prof-status">🥉 Новичок</div></div>
-  <div class="stats3 au">
-    <div class="sbox"><div class="sb-v">0</div><div class="sb-l">Заказов</div></div>
-    <div class="sbox"><div class="sb-v">0₽</div><div class="sb-l">Потрачено</div></div>
-    <div class="sbox"><div class="sb-v">0</div><div class="sb-l">Рефералов</div></div>
-  </div>
-  <div class="ref-block au">
-    <div class="ref-ttl">👥 Реферальная программа</div>
-    <div class="ref-desc">Приглашай друзей в магазин — зарабатывай бонусы за каждого нового покупателя!</div>
-    <div class="ref-link-row" onclick="copyRef('${ref}')">
-      <div class="ref-link-txt">${ref}</div>
-      <button class="ref-copy">Копировать</button>
-    </div>
-  </div>
-  <div class="sec-title au" style="margin:12px 14px 10px">📦 История заказов</div>
-  <div class="empty-s au">Заказов пока нет 🎮</div>`;
-}
-function copyRef(link){ navigator.clipboard?.writeText(link); showToast('🔗 Ссылка скопирована!'); }
-
-/* ══════════════════════
-   FEATURED
-══════════════════════ */
-function renderFeatured(){
-  const picks=[ITEM_MAP[102],ITEM_MAP[1001],ITEM_MAP[204],ITEM_MAP[2101],ITEM_MAP[1101],ITEM_MAP[2001]].filter(Boolean);
-  document.getElementById('featScroll').innerHTML=picks.map(it=>`
-    <div class="fc" onclick="openDetail(${it.id})">
-      <span class="fc-emoji">${it._g.emoji}</span>
-      <div class="fc-name">${it.name}</div>
-      <div class="fc-price">${fmt(it.price)}₽</div>
-    </div>`).join('');
+async function saveToFirebase(){
+  if(!db)return;
+  try{
+    await db.collection('players').doc(getUserId()).set({
+      name:getDisplayName(),
+      username:tgUser?.username||'',
+      score:Number(state.score),
+      perClick:getPerClick(),
+      passiveIncome:getPassiveIncome(),
+      totalClicks:state.totalClicks,
+      referrals:state.referrals,
+      referralRewards:state.referralRewards,
+      lastOnline:state.lastOnline,
+      purchasedPromocodes:state.purchasedPromocodes,
+      upgrades:state.upgrades.map(u=>({count:u.count})),
+      passiveUpgrades:state.passiveUpgrades.map(u=>({count:u.count})),
+      updatedAt:Date.now()
+    },{merge:true});
+  }catch(e){
+    console.error('Save error:',e);
+  }
 }
 
-/* ══════════════════════
-   НАВИГАЦИЯ
-══════════════════════ */
-let currentPage='home';
-function goPage(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.bi').forEach(b=>b.classList.remove('on'));
-  document.getElementById('page-'+name).classList.add('on');
-  const bi=document.getElementById('bi-'+name); if(bi) bi.classList.add('on');
-  document.getElementById('htabs').style.display=name==='catalog'?'flex':'none';
-  if(name==='cart') renderCart();
-  if(name==='profile') renderProfile();
-  if(name==='catalog') renderCatalog();
-  currentPage=name;
-  window.scrollTo(0,0);
+async function loadFromFirebase(){
+  if(!db||!tgUser)return;
+  try{
+    const doc=await db.collection('players').doc(getUserId()).get();
+    if(doc.exists){
+      const d=doc.data();
+      state.score=BigInt(d.score||0);
+      state.totalClicks=d.totalClicks||0;
+      state.lastOnline=d.lastOnline||Date.now();
+      state.referrals=d.referrals||[];
+      state.referralRewards=d.referralRewards||0;
+      state.purchasedPromocodes=d.purchasedPromocodes||[];
+      if(d.upgrades){
+        d.upgrades.forEach((u,i)=>{
+          if(state.upgrades[i])state.upgrades[i].count=u.count||0;
+        });
+      }
+      if(d.passiveUpgrades){
+        d.passiveUpgrades.forEach((u,i)=>{
+          if(state.passiveUpgrades[i])state.passiveUpgrades[i].count=u.count||0;
+        });
+      }
+    }
+  }catch(e){
+    console.error('Load error:',e);
+  }
 }
 
-/* ── INIT ── */
-renderFeatured(); updBadge();
-</script>
+function render(){
+  const perClick=getPerClick();
+  const passiveIncome=getPassiveIncome();
+  
+  document.getElementById('score').textContent=formatNumber(state.score);
+  document.getElementById('perClick').textContent=formatNumber(perClick);
+  document.getElementById('passiveIncome').textContent=formatNumber(passiveIncome)+' 🪙';
+  
+  document.getElementById('upgrades').innerHTML=state.upgrades.map((u,i)=>{
+    const cost=Math.floor(u.cost*Math.pow(1.15,u.count));
+    const locked=state.score<BigInt(cost);
+    return `
+      <div class="upgrade ${locked?'locked':'unlocked'}" data-index="${i}">
+        <div class="upgrade-info">
+          <h3>${u.name}</h3>
+          <p>${u.desc}${u.count>0?' · x'+u.count:''}</p>
+        </div>
+        <div class="upgrade-cost">${formatNumber(cost)} 🪙</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.querySelectorAll('#upgrades .upgrade.unlocked').forEach(el=>{
+    el.addEventListener('click',()=>buyUpgrade(parseInt(el.dataset.index)));
+  });
+  
+  document.getElementById('passiveUpgrades').innerHTML=state.passiveUpgrades.map((u,i)=>{
+    const cost=Math.floor(u.cost*Math.pow(1.15,u.count));
+    const locked=state.score<BigInt(cost);
+    return `
+      <div class="upgrade ${locked?'locked':'unlocked'}" data-index="${i}" data-type="passive">
+        <div class="upgrade-info">
+          <h3>${u.name}</h3>
+          <p>${u.desc}${u.count>0?' · x'+u.count:''}</p>
+        </div>
+        <div class="upgrade-cost">${formatNumber(cost)} 🪙</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.querySelectorAll('#passiveUpgrades .upgrade.unlocked').forEach(el=>{
+    el.addEventListener('click',()=>buyPassiveUpgrade(parseInt(el.dataset.index)));
+  });
+  
+  document.getElementById('statClicks').textContent=formatNumber(state.totalClicks);
+  document.getElementById('statEarned').textContent=formatNumber(state.totalEarned+state.totalSpent);
+  document.getElementById('statPurchases').textContent=state.purchasesCount;
+  document.getElementById('statTime').textContent=formatTime(Date.now()-state.startTime);
+  
+  document.getElementById('friendsCount').textContent=state.referrals.length;
+  document.getElementById('friendsReward').textContent=formatNumber(state.referralRewards);
+  
+  const friendsList=document.getElementById('friendsList');
+  if(state.referrals.length===0){
+    friendsList.innerHTML='<div class="ranking-loading">Пока никого нет 👥</div>';
+  }else{
+    friendsList.innerHTML=state.referrals.map(f=>`
+      <div class="rank-item">
+        <div class="rank-position">👤</div>
+        <div class="rank-info">
+          <div class="rank-name">${f.name}</div>
+          <div class="rank-power">+5,000 🪙</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Промокоды
+  renderPromocodes();
+  
+  saveToFirebase();
+}
+
+function generatePromocode(discount){
+  const prefix='COSMIC';
+  const random=Math.random().toString(36).substring(2,8).toUpperCase();
+  return `${prefix}${discount}_${random}`;
+}
+
+function renderPromocodes(){
+  const promoList=document.getElementById('promocodesList');
+  const myPromos=document.getElementById('myPromocodes');
+  const promoCount=document.getElementById('promoCount');
+  
+  if(!promoList||!myPromos||!promoCount)return;
+  
+  promoCount.textContent=state.purchasedPromocodes.length;
+  
+  promoList.innerHTML=state.promocodes.map((p,i)=>{
+    const purchased=state.purchasedPromocodes.some(pp=>pp.id===p.id);
+    const locked=state.score<BigInt(p.cost)||purchased;
+    return `
+      <div class="upgrade ${locked?'locked':'unlocked'}" data-index="${i}" data-type="promo">
+        <div class="upgrade-info">
+          <h3>${p.name}</h3>
+          <p>${p.desc}${purchased?' · ✅ Куплено':''}</p>
+        </div>
+        <div class="upgrade-cost">${formatNumber(p.cost)} 🪙</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.querySelectorAll('[data-type="promo"].upgrade.unlocked').forEach(el=>{
+    el.addEventListener('click',()=>buyPromocode(parseInt(el.dataset.index)));
+  });
+  
+  if(state.purchasedPromocodes.length===0){
+    myPromos.innerHTML='<div class="ranking-loading">Пока нет промокодов 🎫</div>';
+  }else{
+    myPromos.innerHTML=state.purchasedPromocodes.map(p=>`
+      <div class="rank-item">
+        <div class="rank-position">${p.discount}%</div>
+        <div class="rank-info">
+          <div class="rank-name">${p.name}</div>
+          <div class="rank-power" style="font-family:monospace;font-size:0.9rem;">${p.code}</div>
+        </div>
+        <button onclick="copyPromo('${p.code}')" style="padding:0.5rem 1rem;background:rgba(255,215,0,0.2);border:1px solid var(--accent);border-radius:8px;cursor:pointer;font-size:0.9rem;">📋</button>
+      </div>
+    `).join('');
+  }
+}
+
+function copyPromo(code){
+  navigator.clipboard.writeText(code).then(()=>{
+    if(TgWebApp?.showPopup){
+      TgWebApp.showPopup({
+        title:'✅ Скопировано!',
+        message:`Промокод ${code} скопирован!\n\nИспользуй в @gamestoren_bot`,
+        buttons:[{type:'ok'}]
+      });
+    }
+  });
+}
+
+function buyPromocode(index){
+  const p=state.promocodes[index];
+  const cost=BigInt(p.cost);
+  
+  if(state.purchasedPromocodes.some(pp=>pp.id===p.id)){
+    console.log('⚠️ Промокод уже куплен');
+    return;
+  }
+  
+  if(state.score>=cost){
+    const code=generatePromocode(p.discount);
+    
+    state.score-=cost;
+    state.totalSpent+=cost;
+    state.purchasesCount++;
+    state.purchasedPromocodes.push({
+      id:p.id,
+      name:p.name,
+      code:code,
+      discount:p.discount,
+      purchasedAt:Date.now()
+    });
+    
+    console.log(`✅ Куплен промокод: ${code} (${p.discount}%)`);
+    
+    if(TgWebApp?.showPopup){
+      TgWebApp.showPopup({
+        title:'🎉 Промокод куплен!',
+        message:`${p.name}\nКод: ${code}\n\nИспользуй в @gamestoren_bot для скидки ${p.discount}%!`,
+        buttons:[{type:'ok'}]
+      });
+    }
+    
+    render();
+  }else{
+    console.log('⚠️ Недостаточно монет');
+  }
+}
+
+async function renderRanking(){
+  const list=document.getElementById('rankingList');
+  console.log('🏆 Загружаю рейтинг...');
+  
+  if(!db){
+    console.log('⚠️ Firebase не настроен');
+    list.innerHTML='<div class="ranking-loading">⚠️ Firebase не настроен</div>';
+    return;
+  }
+  
+  list.innerHTML='<div class="ranking-loading">⏳ Загрузка рейтинга...</div>';
+  
+  try{
+    console.log('📥 Запрос к Firebase...');
+    const snapshot=await db.collection('players').orderBy('score','desc').limit(100).get();
+    console.log('📊 Получено документов:',snapshot.size);
+    
+    const players=[];
+    snapshot.forEach(doc=>{
+      const d=doc.data();
+      console.log('   Игрок:',doc.id,d.name,d.score);
+      players.push({
+        id:doc.id,
+        name:d.name||'Игрок',
+        username:d.username,
+        score:d.score||0,
+        perClick:d.perClick||0,
+        isMe:doc.id===getUserId()
+      });
+    });
+    
+    console.log('✅ Обработано игроков:',players.length);
+    
+    if(players.length===0){
+      console.log('⚠️ Нет игроков в рейтинге');
+      list.innerHTML='<div class="ranking-loading">🎮 Будь первым в рейтинге!</div>';
+    }else{
+      document.getElementById('rankingSubtitle').textContent=`Топ-${players.length} игроков`;
+      list.innerHTML=players.map((p,i)=>`
+        <div class="rank-item ${p.isMe?'player':''}">
+          <div class="rank-position">${i+1}${i===0?'🥇':i===1?'🥈':i===2?'🥉':''}</div>
+          <div class="rank-info">
+            <div class="rank-name">${p.name}${p.username?' @'+p.username:''}</div>
+            <div class="rank-power">⚡ ${formatNumber(p.perClick)}/тап</div>
+          </div>
+          <div class="rank-score">${formatNumber(p.score)}</div>
+        </div>
+      `).join('');
+      console.log('✅ Рейтинг отображен!');
+    }
+  }catch(e){
+    console.error('❌ Ошибка загрузки рейтинга:',e);
+    console.error('   Детали:',e.message);
+    
+    if(e.code==='permission-denied'){
+      list.innerHTML=`
+        <div class="ranking-loading">
+          🔒 Нет доступа к Firestore<br>
+          <small style="font-size:0.8rem;margin-top:0.5rem;display:block;">
+            Настрой правила в Firebase Console:<br>
+            Firestore → Rules → allow read: if true;
+          </small>
+        </div>
+      `;
+    }else{
+      list.innerHTML='<div class="ranking-loading">❌ Ошибка: '+e.message+'</div>';
+    }
+  }
+}
+
+function buyUpgrade(index){
+  const u=state.upgrades[index];
+  const cost=BigInt(Math.floor(u.cost*Math.pow(1.15,u.count)));
+  if(state.score>=cost){
+    state.score-=cost;
+    state.totalSpent+=cost;
+    state.purchasesCount++;
+    u.count++;
+    render();
+  }
+}
+
+function buyPassiveUpgrade(index){
+  const u=state.passiveUpgrades[index];
+  const cost=BigInt(Math.floor(u.cost*Math.pow(1.15,u.count)));
+  if(state.score>=cost){
+    state.score-=cost;
+    state.totalSpent+=cost;
+    state.purchasesCount++;
+    u.count++;
+    render();
+  }
+}
+
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab==='ranking')renderRanking();
+  });
+});
+
+document.getElementById('clickTarget').addEventListener('click',()=>{
+  const gain=BigInt(getPerClick());
+  state.score+=gain;
+  state.totalEarned+=gain;
+  state.totalClicks++;
+  render();
+});
+
+document.getElementById('refLink').value=getReferralLink();
+
+document.getElementById('copyBtn').addEventListener('click',async()=>{
+  const link=document.getElementById('refLink').value;
+  try{
+    await navigator.clipboard.writeText(link);
+    document.getElementById('copyBtn').textContent='✅';
+    setTimeout(()=>document.getElementById('copyBtn').textContent='📋',2000);
+  }catch(e){
+    console.error('Copy error:',e);
+  }
+});
+
+document.getElementById('inviteBtn').addEventListener('click',()=>{
+  if(!isTelegram)return;
+  const link=getReferralLink();
+  const msg=`🎮 Играй в Cosmic Clicker!\n💰 Тапай и зарабатывай\n🎁 Бонус при регистрации!`;
+  TgWebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
+});
+
+(async()=>{
+  console.log('🚀 Запуск игры...');
+  console.log('   Telegram:',isTelegram);
+  console.log('   User:',tgUser?tgUser.id:'нет');
+  console.log('   Firebase:',!!db);
+  
+  if(db&&tgUser){
+    console.log('🔄 Обработка реферала...');
+    await processReferral();
+    
+    console.log('📥 Загрузка данных из Firebase...');
+    await loadFromFirebase();
+    
+    // Автоматически сохраняем игрока в рейтинг при первом запуске
+    console.log('💾 Регистрация в рейтинге...');
+    await saveToFirebase();
+  }
+  
+  console.log('⏰ Расчёт оффлайн заработка...');
+  const offlineEarnings=calculateOfflineEarnings();
+  if(offlineEarnings>0){
+    console.log(`💰 Оффлайн заработок: +${formatNumber(offlineEarnings)}`);
+    state.score+=offlineEarnings;
+    state.totalEarned+=offlineEarnings;
+    
+    if(TgWebApp?.showPopup){
+      const hours=Math.min((Date.now()-state.lastOnline)/(1000*60*60),3);
+      TgWebApp.showPopup({
+        title:'💤 Майнинг работал!',
+        message:`Ты был оффлайн ${hours.toFixed(1)} ч\n\nНамайнено: +${formatNumber(offlineEarnings)} 🪙`,
+        buttons:[{type:'ok'}]
+      });
+    }
+  }
+  
+  console.log('🎨 Рендер интерфейса...');
+  render();
+  console.log('✅ Игра загружена!');
+})();
+  </script>
 </body>
 </html>
