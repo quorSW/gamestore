@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -92,16 +93,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .frow{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5}
 .frow:last-child{border-bottom:none}
 .frow .ico{font-size:17px;flex-shrink:0;margin-top:1px}
-.promo-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.promo-label{font-size:13px;font-weight:600;margin-bottom:10px}
-.promo-row{display:flex;gap:8px}
-.promo-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--text);outline:none;transition:border .2s;text-transform:uppercase;font-family:'Inter',sans-serif}
-.promo-input:focus{border-color:var(--accent)}
-.promo-input::placeholder{color:var(--text3);text-transform:none}
-.promo-apply{background:var(--accent);border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif}
-.promo-apply:active{transform:scale(.95)}
-.promo-status{margin-top:8px;font-size:12px;display:none;line-height:1.5}
-.promo-ok{color:var(--green)}.promo-err{color:var(--red)}
+/* ── BONUS BLOCK ── */
+.bonus-block{background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(168,85,247,.08));border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:14px;margin-bottom:12px}
+.bonus-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.bonus-icon{font-size:20px}
+.bonus-title{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.bonus-bal{font-size:12px;color:var(--accent2)}
+.bonus-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.bonus-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:rgba(124,58,237,.25);outline:none;cursor:pointer}
+.bonus-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent2);cursor:pointer;box-shadow:0 2px 8px rgba(168,85,247,.5)}
+.bonus-val{font-size:15px;font-weight:700;color:var(--accent2);min-width:40px;text-align:right}
+.bonus-hint{font-size:11px;color:var(--text3)}
+.bonus-empty{opacity:.85}
+.bonus-zero{font-size:12px;color:var(--text3);font-weight:600}
+.bonus-empty-text{font-size:12px;color:var(--text2);line-height:1.6;margin-top:2px}
+.bonus-rate{font-size:11px;color:var(--text3)}
+/* ── BONUS INFO CARD (profile) ── */
+.bonus-info-card{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(168,85,247,.08));border:1px solid rgba(124,58,237,.3);border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.bic-icon{font-size:28px}
+.bic-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.bic-val{font-size:16px;font-weight:800;color:var(--accent2)}
+.bic-sub{font-size:13px;color:var(--text2);margin-top:1px}
+.bic-hint{font-size:11px;color:var(--text3);margin-top:4px}
+/* ── CART PROMO (kept for compat) ── */
+.cart-promo{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+.cart-promo-title{font-size:13px;font-weight:600;margin-bottom:10px}
 .pay-opts{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
 .pay-title{font-size:13px;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--border)}
 .pay-methods{display:flex}
@@ -128,49 +144,49 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ci-buy-btn{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:7px 10px;color:var(--accent2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif}
 .ci-del-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:7px 10px;color:var(--red);font-size:14px;cursor:pointer}
 .ci-del-btn:active,.ci-buy-btn:active{transform:scale(.9)}
-.cart-promo{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
-.cart-promo-title{font-size:13px;font-weight:600;margin-bottom:10px}
-.cart-sep{height:1px;background:var(--border);margin:10px 0}
-.cart-tot{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+
+.cart-sep{height:1px;background:var(–border);margin:10px 0}
+.cart-tot{background:var(–card);border:1px solid var(–border);border-radius:14px;padding:14px 16px;margin-bottom:12px}
 .tot-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .tot-row:last-child{margin-bottom:0}
-.tot-lbl{font-size:13px;color:var(--text2)}
-.tot-val{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700}
-.tot-row.final .tot-lbl{font-size:15px;font-weight:600;color:var(--text)}
-.tot-row.final .tot-val{font-size:24px;color:var(--accent2)}
-.pay-info-box{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--green);margin-bottom:12px;line-height:1.6}
+.tot-lbl{font-size:13px;color:var(–text2)}
+.tot-val{font-family:‘Rajdhani’,sans-serif;font-size:16px;font-weight:700}
+.tot-row.final .tot-lbl{font-size:15px;font-weight:600;color:var(–text)}
+.tot-row.final .tot-val{font-size:24px;color:var(–accent2)}
+.pay-info-box{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(–green);margin-bottom:12px;line-height:1.6}
 .prof-page{padding:14px}
 .prof-card{background:linear-gradient(135deg,#1a0a38,#0a1030,#0a1820);border:1px solid #2a1a5a;border-radius:20px;padding:24px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
-.prof-card::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(124,58,237,.28),transparent 70%);pointer-events:none}
-.prof-ava{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:27px;margin:0 auto 10px;box-shadow:0 4px 18px var(--glow)}
-.prof-name{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
-.prof-status{display:inline-block;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px}
+.prof-card::before{content:’’;position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(124,58,237,.28),transparent 70%);pointer-events:none}
+.prof-ava{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(–accent),var(–accent2));display:flex;align-items:center;justify-content:center;font-size:27px;margin:0 auto 10px;box-shadow:0 4px 18px var(–glow)}
+.prof-name{font-family:‘Rajdhani’,sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.prof-status{display:inline-block;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(–gold);font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px}
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.sbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
-.sb-v{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent2)}
-.sb-l{font-size:10px;color:var(--text2);margin-top:3px}
-.ref-block{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.sbox{background:var(–card);border:1px solid var(–border);border-radius:14px;padding:14px 8px;text-align:center}
+.sb-v{font-family:‘Rajdhani’,sans-serif;font-size:20px;font-weight:700;color:var(–accent2)}
+.sb-l{font-size:10px;color:var(–text2);margin-top:3px}
+.ref-block{background:var(–card);border:1px solid var(–border);border-radius:var(–r);padding:16px;margin-bottom:12px}
 .ref-ttl{font-size:14px;font-weight:600;margin-bottom:6px}
-.ref-desc{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5}
-.ref-link-row{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.ref-link-txt{flex:1;font-size:12px;color:var(--text2);word-break:break-all}
-.ref-copy-btn{background:var(--accent);border:none;border-radius:8px;padding:7px 12px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif}
+.ref-desc{font-size:12px;color:var(–text2);margin-bottom:10px;line-height:1.5}
+.ref-link-row{background:var(–bg3);border:1px solid var(–border);border-radius:10px;padding:11px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.ref-link-txt{flex:1;font-size:12px;color:var(–text2);word-break:break-all}
+.ref-copy-btn{background:var(–accent);border:none;border-radius:8px;padding:7px 12px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:‘Inter’,sans-serif}
 .ref-copy-btn:active{transform:scale(.93)}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(9,9,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:200;padding:8px 0 18px}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(9,9,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(–border);display:flex;z-index:200;padding:8px 0 18px}
 .bi{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s}
 .bi:active{transform:scale(.88)}
 .bi-icon{font-size:21px}
-.bi-lbl{font-size:10px;color:var(--text3);font-weight:500}
-.bi.on .bi-lbl{color:var(--accent2)}
-.bi.on .bi-icon{filter:drop-shadow(0 0 7px var(--accent2))}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--green);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:999;white-space:nowrap;pointer-events:none}
+.bi-lbl{font-size:10px;color:var(–text3);font-weight:500}
+.bi.on .bi-lbl{color:var(–accent2)}
+.bi.on .bi-icon{filter:drop-shadow(0 0 7px var(–accent2))}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(14px);background:var(–green);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:999;white-space:nowrap;pointer-events:none}
 .toast.v{opacity:1;transform:translateX(-50%) translateY(0)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .au{animation:fadeUp .28s ease}
-.sec-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:10px}
+.sec-title{font-family:‘Rajdhani’,sans-serif;font-size:16px;font-weight:700;margin-bottom:10px}
 .mt14{margin-top:14px}.ph14{padding:0 14px}
-.empty-s{text-align:center;padding:36px 20px;color:var(--text2);font-size:14px}
+.empty-s{text-align:center;padding:36px 20px;color:var(–text2);font-size:14px}
 </style>
+
 </head>
 <body>
 
@@ -196,7 +212,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="chip">💳 СБП</div>
       <div class="chip">🏦 Карта РФ</div>
       <div class="chip">⚡ Автовыдача</div>
-      <div class="chip">🎁 Промокоды</div>
+      <div class="chip">💎 Бонусы</div>
     </div>
   </div>
   <div class="home-stats au">
@@ -275,87 +291,74 @@ const DATA = {
     { key:'brawl', name:'Brawl Stars', currency:'Gems', emoji:'💎', badge:'', btype:'',
       desc:'Кристаллы Brawl Stars. Покупай скины, Brawl Pass и боксы.',
       items:[
-        { id:201, name:'80 Gems',  price:1099,  old:1499,  info:'' },
-        { id:202, name:'170 Gems', price:2199,  old:2999,  info:'' },
-        { id:203, name:'360 Gems', price:4499,  old:5999,  info:'' },
-        { id:204, name:'950 Gems', price:10999, old:13999, info:'Самый выгодный пак' },
+        { id:201, name:'80 Gems',  price:1099,  old:1499 },
+        { id:202, name:'170 Gems', price:2199,  old:2999 },
+        { id:203, name:'360 Gems', price:4499,  old:5999 },
+        { id:204, name:'950 Gems', price:10999, old:13999 },
       ]
     },
   ],
   ai: [
-    { key:'chatgpt', name:'ChatGPT Plus', currency:'Подписка', emoji:'🤖', badge:'ХИТ', btype:'bh',
-      desc:'GPT-4o, DALL-E 3, анализ файлов. Без ограничений на сообщения.',
-      items:[{ id:1001, name:'ChatGPT Plus — 1 месяц', price:1999, old:2599, info:'GPT-4o · DALL-E 3 · без лимитов' }]
-    },
-    { key:'claude', name:'Claude Pro', currency:'Подписка', emoji:'🧠', badge:'', btype:'',
-      desc:'Claude 3.5 Sonnet без суточных лимитов. Лучший AI для текста и кода.',
-      items:[{ id:1101, name:'Claude Pro — 1 месяц', price:1899, old:2499, info:'Claude 3.5 · без лимитов' }]
-    },
-    { key:'midj', name:'Midjourney', currency:'Подписка', emoji:'🎨', badge:'', btype:'',
-      desc:'Генерация изображений по тексту. Лучший AI для арта и дизайна.',
+    { key:'chatgpt',   name:'ChatGPT Plus',    currency:'Подписка', emoji:'🤖', badge:'ТОП', btype:'bh',
+      desc:'Полный доступ к GPT-4o, DALL-E 3, без ограничений.',
+      items:[{ id:1001, name:'ChatGPT Plus — 1 месяц', price:1999, old:2599 }] },
+    { key:'claude',    name:'Claude Pro',       currency:'Подписка', emoji:'🧠', badge:'', btype:'',
+      desc:'Claude 3.5 без лимитов.',
+      items:[{ id:1002, name:'Claude Pro — 1 месяц', price:1899, old:2499 }] },
+    { key:'midj',      name:'Midjourney',       currency:'Подписка', emoji:'🎨', badge:'', btype:'',
+      desc:'Лучший AI для генерации изображений.',
       items:[
-        { id:1201, name:'Midjourney Basic — 1 месяц',    price:1299, old:1699, info:'200 генераций · коммерческое' },
-        { id:1202, name:'Midjourney Standard — 1 месяц', price:2199, old:2899, info:'Без лимита · Relax режим' },
-      ]
-    },
-    { key:'grok', name:'Grok Premium', currency:'Подписка', emoji:'✦', badge:'NEW', btype:'bn',
-      desc:'AI от xAI. Grok-2, генерация изображений Aurora, DeepSearch.',
-      items:[{ id:1301, name:'Grok Premium — 1 месяц', price:1799, old:2299, info:'Grok-2 · Aurora · DeepSearch' }]
-    },
-    { key:'perp', name:'Perplexity Pro', currency:'Подписка', emoji:'🔍', badge:'', btype:'',
-      desc:'AI-поисковик с выходом в интернет. GPT-4o, Claude и Grok внутри.',
-      items:[{ id:1401, name:'Perplexity Pro — 1 месяц', price:1599, old:2099, info:'Реальное время · GPT-4o · Claude' }]
-    },
-    { key:'copilot', name:'GitHub Copilot', currency:'Подписка', emoji:'🐙', badge:'', btype:'',
-      desc:'AI-ассистент для программистов. Работает в VS Code, JetBrains, Neovim.',
-      items:[{ id:1501, name:'GitHub Copilot — 1 месяц', price:1099, old:1499, info:'VS Code · JetBrains · Neovim' }]
-    },
-    { key:'cursor', name:'Cursor Pro', currency:'Подписка', emoji:'🖱️', badge:'NEW', btype:'bn',
-      desc:'AI-редактор кода. Пишет целые файлы, рефакторит и объясняет код.',
-      items:[{ id:1601, name:'Cursor Pro — 1 месяц', price:1799, old:2399, info:'GPT-4o · Claude · без лимитов' }]
-    },
-    { key:'canva', name:'Canva Pro', currency:'Подписка', emoji:'✏️', badge:'', btype:'',
-      desc:'Профессиональный дизайн. Все шаблоны, удаление фона, Brand Kit.',
+        { id:1101, name:'Basic — 1 месяц',    price:1299, old:1699 },
+        { id:1102, name:'Standard — 1 месяц', price:2199, old:2899 },
+      ]},
+    { key:'grok',      name:'Grok Premium',     currency:'Подписка', emoji:'✦', badge:'', btype:'',
+      desc:'Grok-2, Aurora, DeepSearch.',
+      items:[{ id:1003, name:'Grok Premium — 1 месяц', price:1799, old:2299 }] },
+    { key:'perplexity',name:'Perplexity Pro',   currency:'Подписка', emoji:'🔍', badge:'', btype:'',
+      desc:'AI-поиск в реальном времени.',
+      items:[{ id:1004, name:'Perplexity Pro — 1 месяц', price:1599, old:2099 }] },
+    { key:'copilot',   name:'GitHub Copilot',   currency:'Подписка', emoji:'🐙', badge:'', btype:'',
+      desc:'AI для кода прямо в редакторе.',
+      items:[{ id:1005, name:'GitHub Copilot — 1 месяц', price:1099, old:1499 }] },
+    { key:'cursor',    name:'Cursor Pro',        currency:'Подписка', emoji:'🖱️', badge:'', btype:'',
+      desc:'AI-редактор кода нового поколения.',
+      items:[{ id:1006, name:'Cursor Pro — 1 месяц', price:1799, old:2399 }] },
+    { key:'canva',     name:'Canva Pro',         currency:'Подписка', emoji:'✏️', badge:'', btype:'',
+      desc:'Все шаблоны, AI инструменты.',
       items:[
-        { id:1701, name:'Canva Pro — 1 месяц',  price:799,  old:1099, info:'Все шаблоны · AI инструменты' },
-        { id:1702, name:'Canva Pro — 3 месяца', price:1999, old:2999, info:'Выгода 30%' },
-      ]
-    },
-    { key:'adobe', name:'Adobe CC', currency:'Подписка', emoji:'🅰️', badge:'', btype:'',
-      desc:'Photoshop, Illustrator, Premiere, After Effects и 20+ приложений.',
-      items:[{ id:1801, name:'Adobe Creative Cloud — 1 месяц', price:2999, old:3999, info:'20+ приложений · Photoshop · Premiere' }]
-    },
+        { id:1201, name:'Canva Pro — 1 месяц', price:799,  old:1099 },
+        { id:1202, name:'Canva Pro — 3 месяца',price:1999, old:2999 },
+      ]},
+    { key:'adobe',     name:'Adobe CC',          currency:'Подписка', emoji:'🅰️', badge:'', btype:'',
+      desc:'Photoshop, Premiere и 20+ приложений.',
+      items:[{ id:1007, name:'Adobe CC — 1 месяц', price:2999, old:3999 }] },
   ],
   stream: [
-    { key:'spotify', name:'Spotify Premium', currency:'Подписка', emoji:'🎵', badge:'', btype:'',
-      desc:'Музыка без рекламы, оффлайн, высокое качество звука.',
+    { key:'spotify', name:'Spotify',     currency:'Premium', emoji:'🎵', badge:'', btype:'',
+      desc:'Слушай без рекламы, скачивай офлайн.',
       items:[
-        { id:2001, name:'Spotify Premium — 1 месяц',  price:449,  old:599,  info:'Без рекламы · оффлайн' },
-        { id:2002, name:'Spotify Premium — 3 месяца', price:1099, old:1599, info:'Выгода 22%' },
-      ]
-    },
-    { key:'yt', name:'YouTube Premium', currency:'Подписка', emoji:'▶️', badge:'ХИТ', btype:'bh',
-      desc:'YouTube без рекламы, фоновое воспроизведение и YouTube Music.',
+        { id:2001, name:'Premium — 1 месяц', price:449,  old:599  },
+        { id:2002, name:'Premium — 3 месяца',price:1099, old:1599 },
+      ]},
+    { key:'youtube', name:'YouTube',     currency:'Premium', emoji:'▶️', badge:'', btype:'',
+      desc:'Без рекламы, YouTube Music включён.',
       items:[
-        { id:2101, name:'YouTube Premium — 1 месяц',  price:499,  old:699,  info:'Без рекламы · фоновый режим · YT Music' },
-        { id:2102, name:'YouTube Premium — 3 месяца', price:1299, old:1899, info:'Выгода 25%' },
-      ]
-    },
-    { key:'applemus', name:'Apple Music', currency:'Подписка', emoji:'🍎', badge:'', btype:'',
-      desc:'100 млн треков, Dolby Atmos, пространственный звук.',
+        { id:2101, name:'Premium — 1 месяц', price:499,  old:699  },
+        { id:2102, name:'Premium — 3 месяца',price:1299, old:1899 },
+      ]},
+    { key:'apple',   name:'Apple Music', currency:'Premium', emoji:'🍎', badge:'', btype:'',
+      desc:'100М треков, Dolby Atmos.',
       items:[
-        { id:2201, name:'Apple Music — 1 месяц',  price:449,  old:599,  info:'100М треков · Dolby Atmos' },
-        { id:2202, name:'Apple Music — 3 месяца', price:1099, old:1599, info:'Выгода 22%' },
-      ]
-    },
-    { key:'tidal', name:'Tidal HiFi', currency:'Подписка', emoji:'🌊', badge:'NEW', btype:'bn',
-      desc:'Музыка без потерь (Lossless) и Dolby Atmos.',
+        { id:2201, name:'Apple Music — 1 месяц', price:449,  old:599  },
+        { id:2202, name:'Apple Music — 3 месяца',price:1099, old:1599 },
+      ]},
+    { key:'tidal',   name:'Tidal HiFi',  currency:'Premium', emoji:'🌊', badge:'', btype:'',
+      desc:'Lossless качество, Dolby Atmos.',
       items:[
-        { id:2301, name:'Tidal HiFi — 1 месяц',  price:599,  old:849,  info:'Lossless · Dolby Atmos · 100М треков' },
-        { id:2302, name:'Tidal HiFi — 3 месяца', price:1499, old:2199, info:'Выгода 24%' },
-      ]
-    },
-  ]
+        { id:2301, name:'Tidal HiFi — 1 месяц', price:599,  old:849  },
+        { id:2302, name:'Tidal HiFi — 3 месяца',price:1499, old:2199 },
+      ]},
+  ],
 };
 
 /* flat maps */
@@ -366,23 +369,23 @@ Object.values(DATA).flat().forEach(g => {
 });
 
 /* ════════ STATE ════════ */
-let cart = [];
-let detPromo  = { code:'', discount:0 };
-let cartPromo = { code:'', discount:0 };
-let selPayDet  = 'sbp';
-let selPayCart = 'sbp';
-let currentPage = 'home';
-let prevPage    = 'catalog';
-let activeCat   = 'all';
+let cart         = [];
+let userBonuses  = 0;   // баланс бонусов из кликера
+let detBonusUse  = 0;   // сколько тратим на странице товара
+let cartBonusUse = 0;   // сколько тратим в корзине
+let selPayDet    = 'sbp';
+let selPayCart   = 'sbp';
+let currentPage     = 'home';
+let prevPage        = 'catalog';
+let activeCat       = 'all';
 let currentDetailId = null;
 
 /* ════════ HELPERS ════════ */
-const fmt = n => n.toLocaleString('ru');
+const fmt  = n => Math.round(n).toLocaleString('ru');
 const disc = (p, o) => Math.round((1 - p / o) * 100);
 
 function cartSubtotal() { return cart.reduce((s, i) => s + i.price, 0); }
-function cartDiscount() { return cartPromo.discount ? Math.round(cartSubtotal() * cartPromo.discount / 100) : 0; }
-function cartTotal()    { return cartSubtotal() - cartDiscount(); }
+function cartTotal()    { return Math.max(1, cartSubtotal() - cartBonusUse); }
 
 /* ════════ TOAST ════════ */
 let toastTimer;
@@ -400,56 +403,39 @@ function updBadge() {
   else el.classList.remove('v');
 }
 
-/* ════════ PROMO VALIDATION ════════
-   Форматы: COSMIC10-XXXXXX (скидка 10%) и COSMIC20-XXXXXX (скидка 20%)
-   Только @cosmicclicker_bot может выдавать такие коды.
-
-   Mini App проверяет только формат — это быстрая клиентская валидация
-   чтобы не отправлять явный мусор.
-   Реальная проверка (код в БД, не использован) — делает бот при оплате.
-════════════════════════════════ */
-
-const _PROMO_RE = /^COSMIC(10|20)-[A-Z0-9]{6}$/;
-
-function promoLooksValid(code) {
-  return _PROMO_RE.test(code.trim().toUpperCase());
+/* ════════ BONUS HELPERS ════════ */
+function maxBonusFor(price) {
+  return Math.min(Math.floor(price * 0.5), userBonuses, 500);
 }
 
-function promoDiscount(code) {
-  const m = code.trim().toUpperCase().match(/^COSMIC(10|20)-/);
-  return m ? parseInt(m[1]) : 0;
-}
-
-function validatePromo(code, statusEl, onOk) {
-  code = code.trim().toUpperCase();
-  statusEl.style.display = 'block';
-
-  if (!code) {
-    statusEl.className = 'promo-status promo-err';
-    statusEl.textContent = '❌ Введи промокод';
-    return;
-  }
-
-  if (!promoLooksValid(code)) {
-    statusEl.className = 'promo-status promo-err';
-    statusEl.innerHTML =
-      '❌ Промокод не найден.<br>' +
-      '<small>Получи промокод в @cosmicclicker_bot командой /discount</small>';
-    return;
-  }
-
-  // Формат верный — показываем предварительно, реальная проверка при оплате
-  const d = promoDiscount(code);
-  statusEl.className = 'promo-status promo-ok';
-  statusEl.textContent = `✅ Промокод принят — скидка ${d}%`;
-  onOk(code, d);
+function bonusSliderHtml(price, currentUse, sliderId, valId) {
+  if (userBonuses <= 0) return '';
+  const maxB = maxBonusFor(price);
+  if (maxB <= 0) return '';
+  const val = Math.min(currentUse, maxB);
+  return `
+    <div class="bonus-block">
+      <div class="bonus-header">
+        <span class="bonus-icon">💎</span>
+        <span class="bonus-title">Потратить бонусы</span>
+        <span class="bonus-bal">Доступно: <b>${userBonuses}</b></span>
+      </div>
+      <div class="bonus-slider-row">
+        <input type="range" class="bonus-slider" id="${sliderId}"
+          min="0" max="${maxB}" value="${val}" step="1">
+        <span class="bonus-val" id="${valId}">${val}₽</span>
+      </div>
+      <div class="bonus-hint">1 бонус = 1₽ · Макс. 50% от цены</div>
+    </div>`;
 }
 
 /* ════════ PAGE NAVIGATION ════════ */
 function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
   document.querySelectorAll('.bi').forEach(b => b.classList.remove('on'));
-  document.getElementById('page-' + name).classList.add('on');
+  const page = document.getElementById('page-' + name);
+  if (!page) return;
+  page.classList.add('on');
   const bi = document.getElementById('bi-' + name);
   if (bi) bi.classList.add('on');
   document.getElementById('htabs').style.display = name === 'catalog' ? 'flex' : 'none';
@@ -485,7 +471,6 @@ function renderCatalog() {
       <div class="grid2">${g.list.map(gcHtml).join('')}</div>
     </div>`).join('');
 
-  /* bind game card clicks */
   document.querySelectorAll('.gcard[data-key]').forEach(el => {
     el.addEventListener('click', () => openItems(el.dataset.key));
   });
@@ -538,7 +523,7 @@ function openDetail(id) {
   const g = it._g;
   prevPage = currentPage;
   currentDetailId = id;
-  detPromo = { code:'', discount:0 };
+  detBonusUse = 0;
   selPayDet = 'sbp';
 
   const inCart = cart.some(c => c.id === id);
@@ -565,14 +550,7 @@ function openDetail(id) {
           <div class="frow"><span class="ico">💬</span><span>Поддержка 24/7 — ответим за 30 минут</span></div>
           <div class="frow"><span class="ico">✅</span><span>Гарантия возврата при проблемах</span></div>
         </div>
-        <div class="promo-block">
-          <div class="promo-label">🎁 Промокод <span style="color:var(--text2);font-weight:400;font-size:12px">(необязательно)</span></div>
-          <div class="promo-row">
-            <input class="promo-input" id="detPromoInput" placeholder="COSMIC10_XXXXXX" maxlength="16">
-            <button class="promo-apply" id="btnDetPromo">Применить</button>
-          </div>
-          <div class="promo-status" id="detPromoStatus"></div>
-        </div>
+        <div id="detBonusWrap">${bonusSliderHtml(it.price, 0, 'detBonusSlider', 'detBonusVal')}</div>
         <div class="pay-opts">
           <div class="pay-title">💳 Способ оплаты</div>
           <div class="pay-methods">
@@ -585,7 +563,6 @@ function openDetail(id) {
       </div>
     </div>`;
 
-  /* bind all buttons inside detail */
   document.getElementById('btnDetBack').addEventListener('click', () => goPage(prevPage));
 
   document.querySelectorAll('.pay-m[data-m]').forEach(el => {
@@ -596,28 +573,28 @@ function openDetail(id) {
     });
   });
 
-  document.getElementById('btnDetPromo').addEventListener('click', () => {
-    const code = document.getElementById('detPromoInput').value;
-    validatePromo(code, document.getElementById('detPromoStatus'), (c, d) => {
-      detPromo = { code: c, discount: d };
-      const finalPrice = it.price - Math.round(it.price * d / 100);
-      document.getElementById('detPriceDisplay').textContent = `${fmt(finalPrice)}₽`;
-      document.getElementById('btnBuyNow').textContent = `КУПИТЬ ЗА ${fmt(finalPrice)}₽ (−${d}%)`;
+  if (userBonuses > 0 && document.getElementById('detBonusSlider')) {
+    document.getElementById('detBonusSlider').addEventListener('input', function() {
+      detBonusUse = parseInt(this.value);
+      document.getElementById('detBonusVal').textContent = detBonusUse + '₽';
+      const fp = Math.max(1, it.price - detBonusUse);
+      document.getElementById('detPriceDisplay').textContent = fmt(fp) + '₽';
+      document.getElementById('btnBuyNow').textContent =
+        detBonusUse > 0
+          ? `КУПИТЬ ЗА ${fmt(fp)}₽ (−${detBonusUse}₽ бонусами)`
+          : `КУПИТЬ ЗА ${fmt(it.price)}₽`;
     });
-  });
+  }
 
   document.getElementById('btnBuyNow').addEventListener('click', () => {
-    const finalPrice = detPromo.discount
-      ? it.price - Math.round(it.price * detPromo.discount / 100)
-      : it.price;
+    const finalPrice = Math.max(1, it.price - detBonusUse);
     if (tg) tg.sendData(JSON.stringify({
       action: 'buy',
       item_id: id,
       item_name: it.name,
       price: it.price,
       final_price: finalPrice,
-      promo_code: detPromo.code || '',
-      promo_discount: detPromo.discount ? Math.round(it.price * detPromo.discount / 100) : 0,
+      use_bonus: detBonusUse,
       pay_method: selPayDet
     }));
     showToast('🔄 Создаём ссылку на оплату...');
@@ -646,12 +623,11 @@ function renderCart() {
   const el = document.getElementById('cartContent');
   if (!cart.length) {
     el.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Корзина пуста</p></div>`;
+    cartBonusUse = 0;
     return;
   }
 
-  const sub  = cartSubtotal();
-  const disc = cartDiscount();
-  const tot  = cartTotal();
+  const sub = cartSubtotal();
 
   const itemsHtml = cart.map((item, i) => `
     <div class="ci">
@@ -666,23 +642,13 @@ function renderCart() {
       </div>
     </div>`).join('');
 
-  const promoHtml = `
-    <div class="cart-promo">
-      <div class="cart-promo-title">🎁 Промокод</div>
-      <div class="promo-row">
-        <input class="promo-input" id="cartPromoInput" placeholder="COSMIC10_XXXXXX" value="${cartPromo.code}" maxlength="16">
-        <button class="promo-apply" id="btnCartPromo">Применить</button>
-      </div>
-      <div class="promo-status ${cartPromo.discount ? 'promo-ok' : ''}" id="cartPromoStatus"
-           style="display:${cartPromo.discount ? 'block' : 'none'}">
-        ${cartPromo.discount ? `✅ Промокод «${cartPromo.code}» — скидка ${cartPromo.discount}%` : ''}
-      </div>
-    </div>`;
+  const bonusHtml = bonusSliderHtml(sub, cartBonusUse, 'cartBonusSlider', 'cartBonusVal');
+  const tot = cartTotal();
 
   const totHtml = `
     <div class="cart-tot">
       <div class="tot-row"><div class="tot-lbl">Товаров:</div><div class="tot-val">${fmt(sub)}₽</div></div>
-      ${disc ? `<div class="tot-row"><div class="tot-lbl" style="color:var(--green)">Скидка (${cartPromo.discount}%):</div><div class="tot-val" style="color:var(--green)">−${fmt(disc)}₽</div></div>` : ''}
+      ${cartBonusUse > 0 ? `<div class="tot-row"><div class="tot-lbl" style="color:#10b981">💎 Бонусы:</div><div class="tot-val" style="color:#10b981">−${cartBonusUse}₽</div></div>` : ''}
       <div class="cart-sep"></div>
       <div class="tot-row final"><div class="tot-lbl">Итого:</div><div class="tot-val">${fmt(tot)}₽</div></div>
     </div>`;
@@ -696,23 +662,16 @@ function renderCart() {
       </div>
     </div>`;
 
-  el.innerHTML = itemsHtml + promoHtml + totHtml + payHtml +
+  el.innerHTML = itemsHtml + bonusHtml + totHtml + payHtml +
     `<div class="pay-info-box">💳 Оплата через Paypalich — СБП или карта РФ</div>
      <button class="btn-primary" id="btnCheckoutCart">ОПЛАТИТЬ ВСЁ — ${fmt(tot)}₽</button>`;
 
-  /* bind cart buttons */
   document.querySelectorAll('.ci-buy-btn[data-ci]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const i = +btn.dataset.ci;
-      const item = cart[i]; if (!item) return;
-      const finalPrice = cartPromo.discount
-        ? item.price - Math.round(item.price * cartPromo.discount / 100) : item.price;
+      const item = cart[+btn.dataset.ci]; if (!item) return;
       if (tg) tg.sendData(JSON.stringify({
         action: 'buy', item_id: item.id, item_name: item.name,
-        price: item.price, final_price: finalPrice,
-        promo_code: cartPromo.code || '',
-        promo_discount: cartPromo.discount ? Math.round(item.price * cartPromo.discount / 100) : 0,
-        pay_method: selPayCart
+        price: item.price, use_bonus: 0, pay_method: selPayCart
       }));
       showToast('🔄 Создаём ссылку на оплату...');
     });
@@ -725,13 +684,14 @@ function renderCart() {
     });
   });
 
-  document.getElementById('btnCartPromo').addEventListener('click', () => {
-    const code = document.getElementById('cartPromoInput').value;
-    validatePromo(code, document.getElementById('cartPromoStatus'), (c, d) => {
-      cartPromo = { code: c, discount: d };
-      renderCart();
+  if (userBonuses > 0 && document.getElementById('cartBonusSlider')) {
+    document.getElementById('cartBonusSlider').addEventListener('input', function() {
+      cartBonusUse = parseInt(this.value);
+      document.getElementById('cartBonusVal').textContent = cartBonusUse + '₽';
+      const newTot = cartTotal();
+      document.getElementById('btnCheckoutCart').textContent = `ОПЛАТИТЬ ВСЁ — ${fmt(newTot)}₽`;
     });
-  });
+  }
 
   document.querySelectorAll('.pay-m[data-cm]').forEach(el => {
     el.addEventListener('click', () => {
@@ -747,9 +707,8 @@ function renderCart() {
       action: 'checkout_cart',
       cart: cart.map(c => ({ id: c.id, name: c.name, price: c.price })),
       subtotal: cartSubtotal(),
-      discount: cartDiscount(),
+      use_bonus: cartBonusUse,
       total: cartTotal(),
-      promo_code: cartPromo.code || '',
       pay_method: selPayCart
     }));
     showToast('🔄 Создаём ссылку на оплату...');
@@ -770,9 +729,18 @@ function renderProfile() {
       <div class="sbox"><div class="sb-v">0₽</div><div class="sb-l">Потрачено</div></div>
       <div class="sbox"><div class="sb-v">0</div><div class="sb-l">Рефералов</div></div>
     </div>
+    <div class="bonus-info-card au">
+      <div class="bic-icon">💎</div>
+      <div class="bic-content">
+        <div class="bic-title">Мои бонусы</div>
+        <div class="bic-val">${userBonuses} бонусов</div>
+        <div class="bic-sub">${userBonuses > 0 ? `= ${userBonuses}₽ скидки при покупке` : 'Пока нет — зарабатывай в кликере'}</div>
+        <div class="bic-hint">10 000 монет в @cosmicclicker_bot = 1 бонус = 1₽</div>
+      </div>
+    </div>
     <div class="ref-block au">
       <div class="ref-ttl">👥 Реферальная программа</div>
-      <div class="ref-desc">Приглашай друзей — получай бонусы за каждого!</div>
+      <div class="ref-desc">Приглашай друзей — получай 50₽ на баланс за каждого!</div>
       <div class="ref-link-row" id="refLinkRow">
         <div class="ref-link-txt">${ref}</div>
         <button class="ref-copy-btn" data-ref="${ref}">Копировать</button>
@@ -801,28 +769,28 @@ function renderFeatured() {
   });
 }
 
-/* ════════ BIND STATIC ELEMENTS ════════ */
+/* ════════ INIT ════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  /* bottom nav */
+  /* нижняя навигация */
   document.querySelectorAll('.bi[data-page]').forEach(el => {
     el.addEventListener('click', () => goPage(el.dataset.page));
   });
 
-  /* cart icon in header */
+  /* иконка корзины в шапке */
   document.getElementById('btnCartIco').addEventListener('click', () => goPage('cart'));
 
-  /* catalog tabs */
+  /* вкладки каталога */
   document.querySelectorAll('.htab[data-t]').forEach(el => {
     el.addEventListener('click', () => switchCat(el.dataset.t));
   });
 
-  /* items back button */
+  /* кнопка «назад» в списке товаров */
   document.getElementById('btnItemsBack').addEventListener('click', () => goPage(prevPage));
 
-  /* INIT */
   renderFeatured();
   updBadge();
 });
 </script>
+
 </body>
 </html>
