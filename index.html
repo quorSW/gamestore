@@ -401,30 +401,23 @@ function updBadge() {
 }
 
 /* ════════ PROMO VALIDATION ════════
-   Форматы промокодов:
-     GS-XXXX-XXXX   — создаёт админ в /admin
-     COSMIC10-XXXXXX — из @cosmicclicker_bot, скидка 10%
-     COSMIC20-XXXXXX — из @cosmicclicker_bot, скидка 20%
+   Форматы: COSMIC10-XXXXXX (скидка 10%) и COSMIC20-XXXXXX (скидка 20%)
+   Только @cosmicclicker_bot может выдавать такие коды.
 
-   Клиент проверяет только формат.
-   Существование в БД и одноразовость — проверяет бот при оплате.
+   Mini App проверяет только формат — это быстрая клиентская валидация
+   чтобы не отправлять явный мусор.
+   Реальная проверка (код в БД, не использован) — делает бот при оплате.
 ════════════════════════════════ */
 
-const PROMO_RE = [
-  /^GS-[A-Z0-9]{4}-[A-Z0-9]{4}$/,
-  /^COSMIC10-[A-Z0-9]{6}$/,
-  /^COSMIC20-[A-Z0-9]{6}$/,
-];
+const _PROMO_RE = /^COSMIC(10|20)-[A-Z0-9]{6}$/;
 
 function promoLooksValid(code) {
-  return PROMO_RE.some(r => r.test(code.trim().toUpperCase()));
+  return _PROMO_RE.test(code.trim().toUpperCase());
 }
 
-function promoKnownDiscount(code) {
-  code = code.trim().toUpperCase();
-  if (code.startsWith('COSMIC10-')) return 10;
-  if (code.startsWith('COSMIC20-')) return 20;
-  return null; // для GS-кодов скидка неизвестна до проверки бота
+function promoDiscount(code) {
+  const m = code.trim().toUpperCase().match(/^COSMIC(10|20)-/);
+  return m ? parseInt(m[1]) : 0;
 }
 
 function validatePromo(code, statusEl, onOk) {
@@ -441,26 +434,15 @@ function validatePromo(code, statusEl, onOk) {
     statusEl.className = 'promo-status promo-err';
     statusEl.innerHTML =
       '❌ Промокод не найден.<br>' +
-      '<small>Форматы: <b>GS-AB12-CD34</b> или <b>COSMIC10-FW1A0Z</b></small>';
+      '<small>Получи промокод в @cosmicclicker_bot командой /discount</small>';
     return;
   }
 
+  // Формат верный — показываем предварительно, реальная проверка при оплате
+  const d = promoDiscount(code);
   statusEl.className = 'promo-status promo-ok';
-  statusEl.textContent = '⏳ Проверяем...';
-
-  if (tg) tg.sendData(JSON.stringify({ action: 'check_promo', code }));
-
-  setTimeout(() => {
-    const d = promoKnownDiscount(code);
-    if (d !== null) {
-      statusEl.textContent = `✅ Промокод принят — скидка ${d}%!`;
-      onOk(code, d);
-    } else {
-      // GS-код — скидка придёт от бота, временно показываем "принят"
-      statusEl.textContent = '✅ Промокод будет применён при оплате';
-      onOk(code, 0); // бот сам применит скидку
-    }
-  }, 700);
+  statusEl.textContent = `✅ Промокод принят — скидка ${d}%`;
+  onOk(code, d);
 }
 
 /* ════════ PAGE NAVIGATION ════════ */
