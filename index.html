@@ -405,7 +405,7 @@ function updBadge() {
 
 /* ════════ BONUS HELPERS ════════ */
 function maxBonusFor(price) {
-  return Math.min(Math.floor(price * 0.5), userBonuses, 500);
+  return Math.min(Math.floor(price * 0.2), userBonuses, 500);
 }
 
 function bonusSliderHtml(price, currentUse, sliderId, valId) {
@@ -425,7 +425,7 @@ function bonusSliderHtml(price, currentUse, sliderId, valId) {
           min="0" max="${maxB}" value="${val}" step="1">
         <span class="bonus-val" id="${valId}">${val}₽</span>
       </div>
-      <div class="bonus-hint">1 бонус = 1₽ · Макс. 50% от цены</div>
+      <div class="bonus-hint">1 бонус = 1₽ · Макс. 20% от цены</div>
     </div>`;
 }
 
